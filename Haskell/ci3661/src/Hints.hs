@@ -1,13 +1,20 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use newtype instead of data" #-}
+
 module Hints
     (
     ) where
 
-data Target = Target String 
+data Target = Target String deriving (Eq, Show)
 
-data Guess = Guess String 
+data Guess = Guess String deriving (Eq, Show)
 
-data Match = Absent Char| Misplaced Char | Correct Char
+data Match = Absent Char| Misplaced Char | Correct Char deriving (Eq, Show)
 
 
 match :: Guess -> Target -> [Match]
-match g t = undefined
+match (Guess "") _ = []
+match _ (Target "") = []
+match (Guess (g : gs)) (Target (t: ts)) | g == t = Correct g : match (Guess gs) (Target ts)
+                                        | g `elem` ts = Misplaced g : match (Guess gs) (Target ts)
+                                        | otherwise = Absent g : match (Guess gs) (Target ts)

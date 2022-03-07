@@ -1,7 +1,71 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE CPP #-}
+
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Data.Map
+-- Authors   :  Jesus Bandez 17-
+--              Mariangela Rizzo 17-10538
+-- Portability :  portable
+-----------------------------------------------------------------------------
+
 module AAtrees
     (
+      --AAtree type
+#if !defined(TESTING)
+      AA     ,         -- instance Eq,Show,Read
+#else
+      AA(..),          -- instance Eq,Show,Read
+#endif
+
+      -- * Construction
+      empty,
+
+      -- * Insert
+      insert,
+
+      -- * Balance
+      skew,
+      split,
+
+      -- * Query
+      isEmpty,
+      lookup,
+      lvl,
+      sameKey,
+
+      -- * Combine
+      -- ** Union
+      unionAA,
+      union,
+      unionBy,
+
+      -- * Traversal
+      -- ** Map
+      map,
+
+      -- * Conversion
+      -- ** Lists
+      toList, 
+      fromList,
+      deleteBy,
+      nubBy,
+
+      -- * Debugging
+      showTree,
+      showNode,
+
+#if defined(TESTING)
+      -- * Internals
+      AAValid (...),
+      checkInvariant,
+      checkInvariantNode,
+      checkInvariantTree,
+      isValid,
+#endif
+    
     ) where
 
 import Prelude hiding (lookup,map)
@@ -60,15 +124,15 @@ unionBy eq xs ys =  xs ++ foldl (flip (deleteBy eq)) (nubBy eq ys) xs
 
 -- | Si alguna tupla de la lista es igual a la tupla pasada como argumnento, entonces se elimina esa tupla de la lista. 
 -- | deleteBy sameKey (2, "aa") [(1, "a"), (2, "aa"), (3, "aaa")] = [(1, "a"), (3, "aaa")]
-deleteBy                :: (Ord ka) => ((ka, a) -> (ka, a) -> Bool) -> (ka, a) -> [(ka, a)] -> [(ka, a)]
-deleteBy _  _ []        = []
-deleteBy eq (kx, x) ((ky,y):ys)    = if (kx, x) `eq` (ky,y) then ys else (ky,y) : deleteBy eq (kx, x) ys
+deleteBy :: (Ord ka) => ((ka, a) -> (ka, a) -> Bool) -> (ka, a) -> [(ka, a)] -> [(ka, a)]
+deleteBy _  _ [] = []
+deleteBy eq (kx, x) ((ky,y):ys) = if (kx, x) `eq` (ky,y) then ys else (ky,y) : deleteBy eq (kx, x) ys
 
 -- | Dentro de la misma lista, no pueden haber tuplas con la misma clave. Deja la primera que encuentre en la lista.
 -- | nubBy sameKey [(1, "a"), (2, "aa"), (2, "aaa"), (2, "aaaa")] = [(1, "a"), (2, "aa")]
-nubBy                   :: ((ka, a) -> (ka, a) -> Bool) -> [(ka, a)] -> [(ka, a)]
-nubBy eq []             =  []
-nubBy eq ((kx, x) :xs)         =  (kx, x) : nubBy eq (filter (\ (ky, y) -> not (eq (kx, x) (ky, y))) xs)
+nubBy :: ((ka, a) -> (ka, a) -> Bool) -> [(ka, a)] -> [(ka, a)]
+nubBy eq [] =  []
+nubBy eq ((kx, x) :xs) =  (kx, x) : nubBy eq (filter (\ (ky, y) -> not (eq (kx, x) (ky, y))) xs)
 
 -- | Compara dos tuplas y retorna true si el primer elemento es el mismo, false en el caso contrario.
 -- | sameKey (1, "a") (1, "aa") = True
@@ -149,12 +213,25 @@ INVARIANTES
 
 data AAValid a = Valid | LeafNodeNoOne a | LeftChildIsNotOneLess a | RightChildNotOneLessOrEqual a | RightGrandChildNotStrictlyLess a | NoTwoChildren a 
 
--- instance Show (AAValid a) where 
---     show (LeftChildIsNotOneLess a) = "Small"
+instance (Show k, Show a) => Show (AAValid (AA k a))  where 
+     show Valid = "Valid"
+     show (LeafNodeNoOne x) = showTree (LeafNodeNoOne x)
+     show (LeftChildIsNotOneLess x) = showTree (LeftChildIsNotOneLess x)
+     show (RightChildNotOneLessOrEqual x) = showTree (LeafNodeNoOne x)
+     show (RightGrandChildNotStrictlyLess x) = showTree (RightGrandChildNotStrictlyLess x)
+     show (NoTwoChildren x) = showTree (NoTwoChildren x)
 
--- showTree :: (Show k, Show a) => AAValid (AA k a) -> String
--- showTree Valid = "Valid"
--- showTree (LeafNodeNoOne (Node n kv v l r)) = "LeafNodeNoOne (Node " ++ show n ++ " " ++ show kv ++ " " ++ show v ++ " " ++ 
+showTree :: (Show k, Show a) => AAValid (AA k a) -> String
+showTree Valid = "Valid"
+showTree (LeafNodeNoOne t) = "Error LeafNodeNoOne: Las hojas deben tener nivel uno " ++ showNode t
+showTree (LeftChildIsNotOneLess t) = "Error LeftChildIsNotOneLess: El hijo izquierdo no es un nivel menor al de su padre " ++ showNode t
+showTree (RightChildNotOneLessOrEqual t) = "Error RightChildNotOneLessOrEqual: El hijo derecho no es un nivel menor o igual al de su padre " ++ showNode t
+showTree (RightGrandChildNotStrictlyLess t) = "Error RightGrandChildNotStrictlyLess: El nieto derecho no tiene un nivel estrictamente menor al de su abuelo " ++ showNode t
+showTree (NoTwoChildren t) = "Error NoTwoChildren: El nivel del nodo es mayor a uno (no es una hoja) y no tiene dos hijos " ++ showNode t
+
+showNode :: (Show k, Show a) => AA k a -> String 
+showNode Empty = "Empty"
+showNode (Node n kv v l r) = "(Node " ++ show n ++ " " ++ show kv ++ " " ++ show v ++ " " ++ " " ++ showNode l ++ " " ++ showNode r ++ ")"
  
 isValid :: AAValid (AA k a) -> Bool
 isValid Valid      = True
@@ -182,7 +259,3 @@ checkInvariantNode t@(Node n _ _ lnode@(Node ln _ _ _ll _lr)  rnode@(Node rn _ _
                                                                                             | ln /= (n - 1) = LeftChildIsNotOneLess t
                                                                                             | not (isEmpty rr) && lvl rr < n = RightGrandChildNotStrictlyLess t
                                                                                             | otherwise = Valid
-
-
-
--- (Node 2 1 "a"  (Node 1 5 "e" Empty Empty) (Node 3 2 "b" (Node 2 3 "c" Empty Empty) (Node 2 4 "d" (Node 1 6 "f" Empty Empty) (Node 2 7 "h" (Node 1 8 "i" Empty Empty) (Node 1 9 "j" Empty Empty)))))

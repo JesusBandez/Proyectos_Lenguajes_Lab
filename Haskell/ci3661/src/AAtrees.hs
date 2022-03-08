@@ -100,12 +100,10 @@ toList = go []
 -- | Convierte una lista de tuplas donde el primer elemento es la clave y el segundo el valor asociado en un arbol AA.
 -- | fromList [(1, "a"), (2, "b")] = (Node 1 1 "a" Empty (Node 1 2 "b" Empty Empty))
 fromList :: Ord k => [(k,a)] -> AA k a
-fromList xs =  (split . skew)  (go empty xs)
+fromList xs = go empty xs
   where
     go tree []     = tree
-    go tree (x:xs) = tree `seq` go (ins tree x) xs
-
-    ins t (kx,x) = insert kx x t
+    go tree ((kx,x):xs) = tree `seq` go (insert kx x tree ) xs
 
 -- | Une dos arboles AA en un solo arbol AA.
 -- | unionAA (Node 1 1 "a" Empty (Node 2 2 "b" Empty Empty)) (Node 1 2 "A" Empty (Node 2 3 "C" Empty Empty)) = (Node 1 1 "a" Empty (Node 2 2 "b" Empty (Node 1 3 "C" Empty Empty)))
@@ -167,21 +165,22 @@ isEmpty Node {} = False
 -- | = (Node 2 2 "b" (Node 1 1 "a" Empty Empty) (Node 2 4 "d" (Node 1 3 "c" Empty Empty)  (Node 2 5 "e" (Node 1 6 "f" Empty Empty) (Node 1 7 "g" Empty Empty)))
 skew :: AA k a -> AA k a
 skew Empty = Empty
-skew t@(Node n kv v Empty r) = Node n kv v Empty r
-skew (Node n kv v (Node ln lkv lv ll lr) r )
+skew t@(Node n kv v Empty r) = t
+skew t@(Node n kv v (Node ln lkv lv ll lr) r )
     | ln == n = Node ln lkv lv ll (Node n kv v lr r)
-skew t = t
+    | otherwise = t
+
 
 -- | Rebalancea (evita que se rompan los invariantes del arbol AA) un nodo recibido como argumento que representa un arbol AA y lo retorna.
 -- | El balanceo lo hace realizando una rotación a la izquierda y aumentando de nivel para sustituir un subarbol con dos o más enlaces horizontales consecutivos a la derecha por otro con dos enlaces horizontales consecutivos menos.
--- | split (Node 1 1 "a" Empty (Node 1 2 "b" Empty (Node 1 3 "c" Empty Empty))) = (Node 2 2 "b" (Node 1 1 "a" Empty (Node 1 3 "c" Empty Empty) (Node 1 3 "c" Empty Empty)))
+-- | split (Node 1 1 "a" Empty (Node 1 2 "b" Empty (Node 1 3 "c" Empty Empty))) = (Node 2 2 "b" (Node 1 1 "a" Empty Empty (Node 1 3 "c" Empty Empty)))
 split :: AA k a -> AA k a
 split Empty = Empty
 split t@(Node n kv v l Empty) = t
 split t@(Node n kv v l (Node rn rkv rv rl Empty)) = t
-split (Node n kv v l (Node rn rkv rv rl rrnode@(Node rrn _ _ _ _)))
+split t@(Node n kv v l (Node rn rkv rv rl rrnode@(Node rrn _ _ _ _)))
     | n == rrn = Node (rn + 1) rkv rv (Node n kv v l rl) rrnode
-split t = t
+    | otherwise = t
 
 -- | Inserta un nuevo nodo en el arbol si el mismo tiene una clave diferente a las almacenadas y retorna el arbol resultante balanceado.
 -- | insert 3 "c" (Node 2 4 "a" Empty (Node 1 5 "b" Empty Empty)) = (Node 2 4 "a" (Node 1 3 "c" Empty Empty) (Node 1 5 "b" Empty Empty))
@@ -257,5 +256,5 @@ checkInvariantNode t@(Node n _ _ _ Empty)  | n > 1 = NoTwoChildren t
                                            | otherwise = Valid 
 checkInvariantNode t@(Node n _ _ lnode@(Node ln _ _ _ll _lr)  rnode@(Node rn _ _ _rl rr))   | rn /= (n - 1) && rn /= n = RightChildNotOneLessOrEqual t
                                                                                             | ln /= (n - 1) = LeftChildIsNotOneLess t
-                                                                                            | not (isEmpty rr) && lvl rr < n = RightGrandChildNotStrictlyLess t
+                                                                                            | not (isEmpty rr) && lvl rr >= n = RightGrandChildNotStrictlyLess t
                                                                                             | otherwise = Valid

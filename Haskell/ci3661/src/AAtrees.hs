@@ -236,7 +236,7 @@ isValid :: AAValid (AA k a) -> Bool
 isValid Valid      = True
 isValid _ = False
 
--- | Filtra los nodos que retornaron validos de la lista y deja solo los que rompienron invariantes
+-- | Filtra los nodos que retornaron validos de la lista y deja solo los que rompieron invariantes
 checkInvariant :: AA k a -> [AAValid (AA k a)]
 checkInvariant t = filter (not . isValid) (checkInvariantTree t)
 

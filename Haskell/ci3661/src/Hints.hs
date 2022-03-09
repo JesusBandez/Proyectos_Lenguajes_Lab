@@ -16,9 +16,9 @@ instance Show Guess where
 
 data Match = Absent Char| Misplaced Char | Correct Char deriving (Eq)
 instance Show Match where 
-    show (Absent m) = "⬛ " ++ (m: "-Absent")
-    show (Misplaced m) = "🟨 " ++ (m: "-Misplaced")
-    show (Correct m) = "🟩 " ++ (m: "-Correct")
+    show (Absent m) = "\11035 " ++ (m: "-Absent")
+    show (Misplaced m) = "\129000 " ++ (m: "-Misplaced")
+    show (Correct m) = "\129001 " ++ (m: "-Correct")
 
 
 match :: Guess -> Target -> [Match]

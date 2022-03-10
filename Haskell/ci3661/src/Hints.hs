@@ -1,10 +1,14 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use newtype instead of data" #-}
- {-# LANGUAGE UnicodeSyntax #-}
+
 
 module Hints
     (
     ) where
+
+import Text.Read
+import Text.ParserCombinators.ReadPrec
+import Data.Char
 
 data Target = Target String deriving (Eq)
 instance Show Target where 
@@ -16,10 +20,24 @@ instance Show Guess where
 
 data Match = Absent Char| Misplaced Char | Correct Char deriving (Eq)
 instance Show Match where 
-    show (Absent m) = "\11035 " ++ (m: "-Absent")
-    show (Misplaced m) = "\129000 " ++ (m: "-Misplaced")
-    show (Correct m) = "\129001 " ++ (m: "-Correct")
+    show (Absent m) = "\11035" ++ [m]
+    show (Misplaced m) = "\129000" ++ [m]
+    show (Correct m) = "\129001" ++ [m]
 
+instance Read Match where
+    readPrec = parens ( do                             
+                            v <- get
+                            c <- get
+                            if (isLetter c)
+                                then case v of 
+                                        '\129000' -> pure (Misplaced c)
+                                        '\11035' -> pure (Absent c)                                        
+                                        '\129001' -> pure (Correct c)
+                                        _ -> pfail
+                                         
+                                else pfail
+                     )
+                    
 
 match :: Guess -> Target -> [Match]
 match (Guess "") _ = []

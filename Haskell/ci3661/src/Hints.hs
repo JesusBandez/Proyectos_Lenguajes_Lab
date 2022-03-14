@@ -28,7 +28,7 @@ instance Read Match where
     readPrec = parens ( do                             
                             v <- get
                             c <- get
-                            if (isLetter c)
+                            if isLetter c
                                 then case v of 
                                         '\129000' -> pure (Misplaced c)
                                         '\11035' -> pure (Absent c)                                        
@@ -47,7 +47,7 @@ match (Guess (g : gs)) (Target (t: ts)) | g == t = Correct g : match (Guess gs) 
                                         | otherwise = Absent g : match (Guess gs) (Target ts)
 
 fullmatch :: [Match] -> Bool
-fullmatch ms = foldr ((&&) . isCorrect) True ms
+fullmatch = foldr ((&&) . isCorrect) True
             where
                 isCorrect (Correct _) = True
                 isCorrect _ = False

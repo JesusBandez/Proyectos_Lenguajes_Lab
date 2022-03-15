@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import AAtrees
 
-main :: IO ()
-main = someFunc
+main :: IO()
+main = putStrLn $ show $ fromList [(1, "hola"), (2, "qlqw")]

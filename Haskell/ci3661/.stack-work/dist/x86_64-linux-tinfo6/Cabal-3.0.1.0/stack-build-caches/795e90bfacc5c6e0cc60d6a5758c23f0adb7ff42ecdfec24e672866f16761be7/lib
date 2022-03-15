@@ -1,0 +1,40 @@
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/README.md:
+  hash: 0cdb3556139dbbb4a182964933817e725bd4f2129bf6d4096b9c9fb54e3954be
+  size: 9
+  modtime: 1644505862
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/src/AAtrees.hs:
+  hash: 4646f38181c91722c0fd4a82b35210c175a29a88ff06e233c9930457944c6d2a
+  size: 11595
+  modtime: 1647288602
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/package.yaml:
+  hash: 92a0e51dde8e117a74d229ec76770330894fb40f8762075ff3a00a4651bdb0e7
+  size: 1357
+  modtime: 1647361523
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/src/Hints.hs:
+  hash: 57b4dbe32819226052a6c7b1e53ffd520a624246a4c7ff66b43dd41c517c8118
+  size: 1856
+  modtime: 1647288602
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/src/Lib.hs:
+  hash: 8ad912c118cba2ffff9ea041cb366d636500a6e7602693658bfbe8d787c2d442
+  size: 68
+  modtime: 1647361127
+/home/jesus/.stack/programs/x86_64-linux/ghc-tinfo6-8.8.4/lib/ghc-8.8.4/include/ghcversion.h:
+  hash: 297e8571427d670d413977834f5cdfc77cb89051d2f5b8302303c442346d15d0
+  size: 524
+  modtime: 1644506443
+? /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/.stack-work/dist/x86_64-linux-tinfo6/Cabal-3.0.1.0/build/autogen/cabal_macros.h
+: hash: 3519a9428b1a7183724c20ebd091662c237a6ecf4afc1f8627dc374e915890ab
+  size: 5347
+  modtime: 1647288602
+/usr/include/stdc-predef.h:
+  hash: 38bac01c137da3ec6623c5166d420cd0bdee18e1d6605921f138f74ef902f102
+  size: 2290
+  modtime: 1645731939
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/ChangeLog.md:
+  hash: 009a99c391931d68e7c34e0c529d55f0e5c664f0492c1e9f3a2f1e0009f48e75
+  size: 46
+  modtime: 1644505862
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/ci3661.cabal:
+  hash: b4a6eff8ffddf176b89cc1eb602ff13133fd4e7d1fec82bac7f4df49f9c24a85
+  size: 1437
+  modtime: 1647361523

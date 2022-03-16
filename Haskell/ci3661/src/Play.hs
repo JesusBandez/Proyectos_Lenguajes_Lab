@@ -28,13 +28,16 @@ initialState = pure (GS 0 0 0 0 Empty empty)
 readFive :: IO String 
 readFive = recursiveReadFive "" 0
 
+{-Tiene problemas al momento de cargarse como ejecutable. El getChar espera por toda una string en vez de tomar solo un caracter 
+Esto hace que se puedan borrar los caracteres ya introducidos luego de pulsar enter.
+Por ahora, al pulsar enter y no ser aceptado, se borra lo que se lleva. No se esta respetando lo que pide el enunciado-}
 recursiveReadFive :: String -> Int -> IO String
 recursiveReadFive str i = do c <- getChar
                              case c of
                                 '\0127' | i>0 -> recursiveReadFive (init str) (i-1)
                                 '\n' | i==5 -> pure str
-                                     | otherwise -> recursiveReadFive str i
-                                c | isAlpha c -> do putChar c
-                                                    recursiveReadFive (str ++ [toLower c]) (i+1)
+                                     | otherwise -> recursiveReadFive "" 0
+                                c | isAlpha c -> recursiveReadFive (str ++ [toLower c]) (i+1)
 
                                 _ -> recursiveReadFive str i
+

@@ -2,9 +2,7 @@
 {-# HLINT ignore "Use newtype instead of data" #-}
 
 
-module Hints
-    (
-    ) where
+module Match where
 
 import Text.Read
 import Text.ParserCombinators.ReadPrec

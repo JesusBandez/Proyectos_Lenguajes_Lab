@@ -1,7 +1,9 @@
 module Play where
+
 import AAtrees
 import Match
 import Data.Char (toLower, isAlpha)
+import Util
 
 data GameState = GS { played :: Int
                  , won :: Int
@@ -41,3 +43,43 @@ recursiveReadFive str i = do c <- getChar
 
                                 _ -> recursiveReadFive str i
 
+
+{-Mostrar msg 
+    Esperar entrada 
+    Si es palabra en diccionario
+        Hacer match y mostrar pista
+        Si es full match
+            El resultado es victoria
+        Si el turno es el 6
+            El resultado es derrota            
+        En otro caso
+            Se continua al siguiente turno
+    En otro caso,
+        Mostrar que no existe esa palabra
+        Repetir el intento
+            -}
+
+play :: GameState -> IO Result
+play gs = playLoop (dict gs) 1 (target gs)
+
+playLoop :: AA String String -> Int -> Target -> IO Result
+playLoop dict turn target = do putStr $ turnStartMsg turn
+                               input <- readFive
+                               putStr $ input ++ " "
+                               case AAtrees.lookup input dict of
+                                   Nothing -> do putStr $ wordNotValid input
+                                                 playLoop dict turn target
+
+                                   Just _ ->  let hint = match (Guess input) target in
+                                                if fullmatch hint
+                                                    then pure (Win target)
+                                                    else if turn == 6
+                                                        then pure (Lose target)
+                                                        else do putStr $ show hint
+                                                                playLoop dict (turn+1) target
+                                                
+turnStartMsg :: Int -> String 
+turnStartMsg turn = "Guess " ++ show turn ++ "? "
+
+wordNotValid :: String -> String
+wordNotValid word = "Your guess '" ++ word ++ "' is not a valid word!"

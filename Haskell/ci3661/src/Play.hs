@@ -9,7 +9,15 @@ data GameState = GS { played :: Int
                  , target:: Target
                  , dict :: AA String String}
 
-                 
+data Result = Win Target
+            | Lose Target
+            
+instance Show Result where
+    show (Win (Target t)) = "Got it! It was " ++ t ++ " (TODO AGREGAR EMOTICON)"
+    show (Lose (Target t)) = "Bummer! It was " ++ t ++ " (TODO AGREGAR EMOTICON)"
+    show _ = ""
+
+
 instance Show GameState where
     show (GS p w l s _ _) = "Played: " ++ show p ++ " Won: " ++ show w ++ " Lost: " ++ show l ++ " Streak: " ++ show s
 

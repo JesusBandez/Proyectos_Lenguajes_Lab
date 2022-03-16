@@ -1,6 +1,7 @@
 module Play where
 import AAtrees
 import Match
+import Data.Char (toLower, isAlpha)
 
 data GameState = GS { played :: Int
                  , won :: Int
@@ -11,7 +12,7 @@ data GameState = GS { played :: Int
 
 data Result = Win Target
             | Lose Target
-            
+
 instance Show Result where
     show (Win (Target t)) = "Got it! It was " ++ t ++ " (TODO AGREGAR EMOTICON)"
     show (Lose (Target t)) = "Bummer! It was " ++ t ++ " (TODO AGREGAR EMOTICON)"
@@ -24,3 +25,16 @@ instance Show GameState where
 initialState :: IO GameState
 initialState = pure (GS 0 0 0 0 Empty empty)
 
+readFive :: IO String 
+readFive = recursiveReadFive "" 0
+
+recursiveReadFive :: String -> Int -> IO String
+recursiveReadFive str i = do c <- getChar
+                             case c of
+                                '\0127' | i>0 -> recursiveReadFive (init str) (i-1)
+                                '\n' | i==5 -> pure str
+                                     | otherwise -> recursiveReadFive str i
+                                c | isAlpha c -> do putChar c
+                                                    recursiveReadFive (str ++ [toLower c]) (i+1)
+
+                                _ -> recursiveReadFive str i

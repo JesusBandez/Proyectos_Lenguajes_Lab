@@ -8,9 +8,11 @@ import Text.Read
 import Text.ParserCombinators.ReadPrec
 import Data.Char
 
-data Target = Target String deriving (Eq)
+data Target = Target String | Empty 
+    deriving (Eq)    
 instance Show Target where 
     show (Target t) = "It was " ++ t
+    show Empty = ""
 
 data Guess = Guess String deriving (Eq)
 instance Show Guess where 

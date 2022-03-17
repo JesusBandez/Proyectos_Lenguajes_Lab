@@ -63,12 +63,12 @@ playLoop dict turn target = do putStr $ turnStartMsg turn
                                                  playLoop dict turn target
 
                                    Just _ ->  let hint = match (Guess input) target in
-                                                if fullmatch hint
-                                                    then pure (Win target)
-                                                    else if turn == Util.turns
-                                                        then pure (Lose target)
-                                                        else do print hint
-                                                                playLoop dict (turn+1) target
+                                                do print hint
+                                                   if fullmatch hint
+                                                      then pure (Win target)
+                                                      else if turn == Util.turns
+                                                          then pure (Lose target)
+                                                          else playLoop dict (turn+1) target
 -- Funcion de soporte para imprimir string                                       
 turnStartMsg :: Int -> String 
 turnStartMsg turn = "Guess " ++ show turn ++ "? "

@@ -30,11 +30,12 @@ initialState = pure (GS 0 0 0 0 Empty empty)
 readFive :: IO String 
 readFive = recursiveReadFive "" 0
 
-{-Tiene problemas al momento de cargarse como ejecutable. El getChar espera por toda una string en vez de tomar solo un caracter 
-Esto hace que se puedan borrar los caracteres ya introducidos luego de pulsar enter.
-Por ahora, al pulsar enter y no ser aceptado, se borra lo que se lleva. No se esta respetando lo que pide el enunciado-}
+{-Tiene problemas al momento de cargarse como ejecutable. El getChar espera por toda una string en vez de tomar caracter a caracter
+Esto trae problemas, si se escribe algo y se pulsa enter, no hay forma de borrar esos caracteres. Actualmente se resuelve reiniciando
+la string. El otro problema consiste que cada vez que se pulsa enter se salta una linea, y en el enunciado no debe pasar eso
+-}
 recursiveReadFive :: String -> Int -> IO String
-recursiveReadFive str i = do c <- getChar
+recursiveReadFive str i = do c <- getChar                             
                              case c of
                                 '\0127' | i>0 -> recursiveReadFive (init str) (i-1)
                                 '\n' | i==5 -> pure str
@@ -57,7 +58,7 @@ playLoop dict turn target = do putStr $ turnStartMsg turn
                                    Just _ ->  let hint = match (Guess input) target in
                                                 if fullmatch hint
                                                     then pure (Win target)
-                                                    else if turn == 6
+                                                    else if turn == Util.turns
                                                         then pure (Lose target)
                                                         else do print hint
                                                                 playLoop dict (turn+1) target
@@ -67,3 +68,18 @@ turnStartMsg turn = "Guess " ++ show turn ++ "? "
 
 wordNotValid :: String -> String
 wordNotValid word = "Your guess '" ++ word ++ "' is not a valid word!"
+
+
+playTheGame :: GameState -> IO()
+playTheGame gs = let targetWord = Target "abaft" -- Cambiar para que se consiga de forma aleatoria con la funcion pickTarget
+                     f gs =  do res <- play gs{target = targetWord, played = played gs+1}
+                                print res
+                                case res of
+                                    Win _ -> pure gs {won = won gs + 1, streak = streak gs + 1}
+                                    Lose _ -> pure gs {lost = lost gs + 1, streak = 0}
+                    in do gs' <- f gs
+                          print gs'
+                          playAgain <- yesOrNo "Play again?"
+                          if playAgain
+                            then playTheGame gs'
+                             else putStrLn "Bye!"

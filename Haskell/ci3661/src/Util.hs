@@ -4,7 +4,7 @@ import AAtrees ( empty, insert, AA )
 
 {-Funcion constante con el numero de turnos para el juego-}
 turns :: Int
-turns = 6
+turns = 1
 
 {-Ruta del archivo con las palabras a usar-}
 dictionary :: FilePath 
@@ -46,8 +46,6 @@ yesOrNo mesagge = do putStr $ mesagge ++ " (y/n)"
 yesOrNoLoop :: IO Bool
 yesOrNoLoop = do c <- getChar 
                  case c of
-                         'y' -> do putStrLn "c" 
-                                   pure True
-                         'n' -> do putStrLn "c"
-                                   pure False
+                         'y' -> do pure True
+                         'n' -> do pure False
                          _ -> yesOrNoLoop

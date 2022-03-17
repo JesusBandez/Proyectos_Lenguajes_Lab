@@ -4,7 +4,7 @@ import AAtrees ( empty, insert, AA )
 
 {-Funcion constante con el numero de turnos para el juego-}
 turns :: Int
-turns = 1
+turns = 6
 
 {-Ruta del archivo con las palabras a usar-}
 dictionary :: FilePath 

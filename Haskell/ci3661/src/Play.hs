@@ -19,8 +19,8 @@ instance Show GameState where
 data Result = Win Target
             | Lose Target
 instance Show Result where
-    show (Win (Target t)) = "Got it! It was " ++ t ++ " (TODO AGREGAR EMOTICON)"
-    show (Lose (Target t)) = "Bummer! It was " ++ t ++ " (TODO AGREGAR EMOTICON)"
+    show (Win (Target t)) = "Got it! It was \171" ++ t ++ "\187 \128526"
+    show (Lose (Target t)) = "Bummer! It was \171" ++ t ++ "\187 \128128"
     show _ = ""
 
 {-Funcion que inicia el primer estado del juego-}

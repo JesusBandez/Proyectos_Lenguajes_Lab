@@ -42,11 +42,13 @@ loadDictionary x = do l <- readFile x
 
 {-Muestra un mensaje arbitrario y luego pide pide una decision afirmativa o negativa-}
 yesOrNo :: String -> IO Bool 
-yesOrNo mesagge = do putStr $ mesagge ++ " (y/n)?"
+yesOrNo mesagge = do hSetBuffering stdout NoBuffering -- Importante para mostrar de manera correcta los putStr
+                     hSetBuffering stdin NoBuffering
+                     hSetEcho stdin False
+                     putStr $ mesagge ++ " (y/n)?"
                      yesOrNoLoop
 yesOrNoLoop :: IO Bool
-yesOrNoLoop = do hSetEcho stdin False
-                 c <- getChar 
+yesOrNoLoop = do c <- getChar 
                  case c of
                          'y' -> do putStrLn [c]
                                    pure True

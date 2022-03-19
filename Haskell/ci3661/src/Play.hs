@@ -4,7 +4,7 @@ import AAtrees ( empty, lookup, AA )
 import Match ( fullmatch, match, Guess(Guess), Target(..) )
 import Data.Char (toLower, isAlpha)
 import Util ( turns, yesOrNo )
-
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
 {-Tipo de dato que representa el estado actual del juego-}
 data GameState = GS { played :: Int
                  , won :: Int
@@ -29,7 +29,7 @@ initialState = pure (GS 0 0 0 0 Empty empty)
 
 {-Leer la conjetura del usuario-}
 readFive :: IO String 
-readFive = recursiveReadFive "" 0
+readFive = do recursiveReadFive "" 0
 
 
 -- !!!!!!!!!!!!!!!!!!!!! HELP
@@ -40,24 +40,27 @@ la string. El otro problema consiste que cada vez que se pulsa enter se salta un
 recursiveReadFive :: String -> Int -> IO String
 recursiveReadFive str i = do c <- getChar                     
                              case c of
-                                '\0127' | i>0 -> recursiveReadFive (init str) (i-1)
-                                '\n' | i==5 -> pure str
-                                     | otherwise -> recursiveReadFive "" 0
-                                c | isAlpha c -> recursiveReadFive (str ++ [toLower c]) (i+1)
-
+                                '\0127'| i > 0     -> do putStr "\b \b" 
+                                                         recursiveReadFive (init str) (i-1)
+                                '\n'   | i == 5    -> pure str
+                                c      | isAlpha c && i < 5 -> do putChar c
+                                                                  recursiveReadFive (str ++ [toLower c]) (i+1)
                                 _ -> recursiveReadFive str i
 -- !!!!!!!!!!!!!!!!!!!!!
 
 {- Funciones que ejecutan una sesion del juego-}
 play :: GameState -> IO Result
-play gs = playLoop (dict gs) 1 (target gs)
+play gs = do hSetBuffering stdout NoBuffering -- Importante para mostrar de manera correcta los putStr
+             hSetBuffering stdin NoBuffering
+             hSetEcho stdin False
+             playLoop (dict gs) 1 (target gs)
 
 {- Bucle donde se piden las palabras al jugador y se comparan con el
 target-}
 playLoop :: AA String String -> Int -> Target -> IO Result
 playLoop dict turn target = do putStr $ turnStartMsg turn
                                input <- readFive
-                               putStr $ input ++ " "
+                               putStr " "
                                case AAtrees.lookup input dict of
                                    Nothing -> do putStrLn $ wordNotValid input
                                                  playLoop dict turn target

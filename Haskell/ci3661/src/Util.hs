@@ -1,6 +1,7 @@
 module Util where
 import Data.Char (isUpper, isAlpha)
 import AAtrees ( empty, insert, AA )
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
 
 {-Funcion constante con el numero de turnos para el juego-}
 turns :: Int
@@ -41,11 +42,14 @@ loadDictionary x = do l <- readFile x
 
 {-Muestra un mensaje arbitrario y luego pide pide una decision afirmativa o negativa-}
 yesOrNo :: String -> IO Bool 
-yesOrNo mesagge = do putStr $ mesagge ++ " (y/n)"
+yesOrNo mesagge = do putStr $ mesagge ++ " (y/n)?"
                      yesOrNoLoop
 yesOrNoLoop :: IO Bool
-yesOrNoLoop = do c <- getChar 
+yesOrNoLoop = do hSetEcho stdin False
+                 c <- getChar 
                  case c of
-                         'y' -> do pure True
-                         'n' -> do pure False
+                         'y' -> do putStrLn [c]
+                                   pure True
+                         'n' -> do putStrLn [c]
+                                   pure False
                          _ -> yesOrNoLoop

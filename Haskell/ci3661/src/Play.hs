@@ -38,7 +38,7 @@ Esto trae problemas, si se escribe algo y se pulsa enter, no hay forma de borrar
 la string. El otro problema consiste que cada vez que se pulsa enter se salta una linea, y en el enunciado no debe pasar eso
 -}
 recursiveReadFive :: String -> Int -> IO String
-recursiveReadFive str i = do c <- getChar                             
+recursiveReadFive str i = do c <- getChar                     
                              case c of
                                 '\0127' | i>0 -> recursiveReadFive (init str) (i-1)
                                 '\n' | i==5 -> pure str

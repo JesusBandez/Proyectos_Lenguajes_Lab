@@ -26,8 +26,9 @@ source-repository head
 library
   exposed-modules:
       AAtrees
-      Hints
       Lib
+      Match
+      Play
       Util
   other-modules:
       Paths_ci3661

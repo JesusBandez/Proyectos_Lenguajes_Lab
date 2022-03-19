@@ -1,6 +1,13 @@
 module Main where
 
-import AAtrees
+import Play
+import Util ( dictionary, loadDictionary ) 
+import Match
 
-main :: IO()
-main = putStrLn $ show $ fromList [(1, "hola"), (2, "qlqw")]
+import System.IO (stdout, hSetBuffering, BufferMode (NoBuffering) )
+
+main = do hSetBuffering stdout NoBuffering -- Importante para mostrar de manera correcto los putStr
+          gs <- initialState
+          dictionary <- loadDictionary dictionary
+          playTheGame gs{dict = dictionary}
+

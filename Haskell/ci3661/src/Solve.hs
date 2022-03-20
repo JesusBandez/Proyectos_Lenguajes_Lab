@@ -23,6 +23,8 @@ initialSolver s = pure (SS "" [] 0 empty s)
 solveTheGame :: SolverState -> IO()
 solveTheGame ss = undefined
 
+{-Funcion que reduce una lista de posibilidades acorde al match pasado como parámetro
+Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] ["absme", "abste", "ugoto", "ogoti", "uimto", "impto"] = ["ogoti","uimto"] -}
 sieve :: [Match] -> [String] -> [String]
 sieve [] (s : ss) = s : ss
 sieve m [] = []
@@ -34,7 +36,7 @@ sieve (m : ms) (ls : lss) = reduce (isValid (m : ms)) (ls : lss)
                                                                                 | otherwise = False
                                 isValid (Absent as: ams) (s : ss) fullWord      | as `elem` fullWord = False
                                                                                 | otherwise = isValid ams ss fullWord
-                                isValid (Misplaced mps: mpms) (s : ss) fullWord | mps `elem` fullWord = isValid mpms ss fullWord
+                                isValid (Misplaced mps: mpms) (s : ss) fullWord | mps /= s && mps `elem` fullWord = isValid mpms ss fullWord
                                                                                 | otherwise = False
 
 reduce :: (a -> a -> Bool) -> [a] -> [a]

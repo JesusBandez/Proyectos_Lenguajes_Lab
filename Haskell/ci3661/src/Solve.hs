@@ -1,9 +1,13 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Solve where
 import Util ()
-import AAtrees ( empty, lookup, AA )
+import AAtrees ( empty, lookup, AA, insert, fromList )
 import Match
 
 import System.Random (Random (randomRIO))
+import Data.List ( group, sort )
+import Prelude hiding (lookup)
+import Data.Maybe
 
 data Solver = Naive | Cleverdata
 
@@ -28,7 +32,7 @@ Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] 
 sieve :: [Match] -> [String] -> [String]
 sieve [] (s : ss) = s : ss
 sieve m [] = []
-sieve (m : ms) (ls : lss) = reduce (isValid (m : ms)) (ls : lss) 
+sieve (m : ms) (ls : lss) = reduce (isValid (m : ms)) (ls : lss)
                             where
                                 isValid [] _ _ = True
                                 isValid _ "" _ = True
@@ -54,3 +58,19 @@ pickRandom xs = (xs !!) <$> randomRIO (0, length xs - 1)
 
 clever :: [Match] -> SolverState -> IO SolverState
 clever _ _ = undefined
+
+{-Indica la frecuencia de cada letra en una lista de palabras
+Ejemplo: freqL ["ugito", "ogomo", "asbte", "absme"] = [('a',2),('b',2),('e',2),('g',2),('i',1),('m',2),('o',4),('s',2),('t',2),('u',1)]-}
+freqL :: [String] -> AA Char Int
+freqL ws = fromList $ freqL' $ concat ws
+            where 
+                freqL' a = map (\x -> (head x, length x)) $ group $ sort a
+
+{-Calcula la puntuacion de cada palabra en una lista de palabras acorde a las letras que posee 
+scoreWords ["ugito", "ogomo", "asbte", "absme"] = [("absme",10),("asbte",10),("ogomo",16),("ugito",10)]-}
+scoreWords :: [String] -> AA String Int
+scoreWords ws = fromList $ zip ws $ map (scoreWord (freqL $ ws)) ws
+
+scoreWord :: AA Char Int -> String -> Int
+scoreWord _ [] = 0
+scoreWord aa (w : ws) = fromMaybe 0 (lookup w aa) + scoreWord aa ws

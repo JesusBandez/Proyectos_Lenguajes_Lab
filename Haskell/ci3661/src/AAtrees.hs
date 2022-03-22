@@ -86,7 +86,7 @@ instance Ord k => Monoid (AA k v) where
 
 instance (Ord k) =>  Foldable (AA k) where
   foldr f b Empty = b
-  foldr f b (Node lvl k v left right) = foldr f ( f v ( foldr f b right )) left
+  foldr f b (Node _ _ v left right) = foldr f ( f v ( foldr f b right )) left
 
 instance (Show k, Show a) => Show (AA k a) where
   showsPrec d m  = showParen (d > 10) $

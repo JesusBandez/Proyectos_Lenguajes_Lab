@@ -71,23 +71,26 @@ module AAtrees
 import Prelude hiding (lookup,map)
 import Debug.Trace (traceEvent)
 
+
 -- | Un arbol AA que contiene una clave (k) y un valor asociado a esa clave (a).
 data AA k a = Empty | Node { lvl :: Int, key :: k, val :: a, lAA :: AA k a, rAA :: AA k a}
 
-instance (Ord k, Semigroup (AA k v)) => Monoid (AA k v) where
-    mempty  = empty
-    mappend = unionAA
+instance Ord k => Functor (AA k) where
+  fmap f m  = map f m
+
+instance Ord k => Semigroup (AA k v) where
+  a0 <> a1 = a0 `unionAA` a1 
+
+instance Ord k => Monoid (AA k v) where
+    mempty  = empty    
+
+instance (Ord k) =>  Foldable (AA k) where
+  foldr f b Empty = b
+  foldr f b (Node lvl k v left right) = foldr f ( f v ( foldr f b right )) left
 
 instance (Show k, Show a) => Show (AA k a) where
   showsPrec d m  = showParen (d > 10) $
     shows (toList m)
-
-instance Functor (AA k) where
-  fmap f m  = map f m
-
-instance Foldable (AA k) where
-  foldMap _f Empty = mempty
-  foldMap f (Node _n _kv v l r) = foldMap f l `mappend` f v `mappend` foldMap f r
 
 -- | Convierte un arbol AA en una lista de tuplas donde el primer elemento es la clave y el segundo el valor asociado.
 -- | toList (Node 1 1 "a" Empty (Node 2 2 "b" Empty Empty)) = [(1, "a"), (2, "b")]
@@ -143,7 +146,7 @@ map :: (a -> b) -> AA k a -> AA k b
 map f = go
   where
       go Empty = Empty
-      go (Node n kv v l r) = Node n kv ((\_ x -> f x) kv v) (go l) (go r)
+      go (Node n kv v l r) = Node n kv (f v) (go l) (go r)
 
 {-------------------------------------------------------------------------------------------------------------
 FUNCIONES

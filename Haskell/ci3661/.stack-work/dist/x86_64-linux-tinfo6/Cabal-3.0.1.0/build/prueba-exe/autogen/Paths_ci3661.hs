@@ -30,7 +30,7 @@ version = Version [0,1,0,0] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/.stack-work/install/x86_64-linux-tinfo6/795e90bfacc5c6e0cc60d6a5758c23f0adb7ff42ecdfec24e672866f16761be7/8.8.4/bin"
-libdir     = "/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/.stack-work/install/x86_64-linux-tinfo6/795e90bfacc5c6e0cc60d6a5758c23f0adb7ff42ecdfec24e672866f16761be7/8.8.4/lib/x86_64-linux-ghc-8.8.4/ci3661-0.1.0.0-4a1TlerTIPJId1YD0ofK2E-prueba-exe"
+libdir     = "/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/.stack-work/install/x86_64-linux-tinfo6/795e90bfacc5c6e0cc60d6a5758c23f0adb7ff42ecdfec24e672866f16761be7/8.8.4/lib/x86_64-linux-ghc-8.8.4/ci3661-0.1.0.0-Ikq79GwDyIcEJNKz4zFcCg-prueba-exe"
 dynlibdir  = "/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/.stack-work/install/x86_64-linux-tinfo6/795e90bfacc5c6e0cc60d6a5758c23f0adb7ff42ecdfec24e672866f16761be7/8.8.4/lib/x86_64-linux-ghc-8.8.4"
 datadir    = "/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/.stack-work/install/x86_64-linux-tinfo6/795e90bfacc5c6e0cc60d6a5758c23f0adb7ff42ecdfec24e672866f16761be7/8.8.4/share/x86_64-linux-ghc-8.8.4/ci3661-0.1.0.0"
 libexecdir = "/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/.stack-work/install/x86_64-linux-tinfo6/795e90bfacc5c6e0cc60d6a5758c23f0adb7ff42ecdfec24e672866f16761be7/8.8.4/libexec/x86_64-linux-ghc-8.8.4/ci3661-0.1.0.0"

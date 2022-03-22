@@ -7,9 +7,9 @@
   size: 11595
   modtime: 1647706203
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/package.yaml:
-  hash: 32888f1b03cf29a9ab6ededd3cc6d1e9f25ffa3b1d1b613af0bf10db253af7eb
-  size: 1165
-  modtime: 1647711649
+  hash: f7a77f71775cee2d295c9a8e876aa4044cce0be28b4b4c5120358b3023235774
+  size: 1202
+  modtime: 1647956991
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/src/Lib.hs:
   hash: 8ad912c118cba2ffff9ea041cb366d636500a6e7602693658bfbe8d787c2d442
   size: 68
@@ -19,17 +19,17 @@
   size: 524
   modtime: 1644506443
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/src/Play.hs:
-  hash: 55220d0066ff5d682e2928b373aba47edec88bcebbfb60796505bfa89ecf2584
-  size: 4750
-  modtime: 1647712000
+  hash: 99aa42574b40710fb1fdab7a3920290a7934f3efd66758543e94bed90e7c102e
+  size: 4325
+  modtime: 1647720295
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/src/Match.hs:
   hash: 7bad097eb6fa595cb8abad23e0968e1e9c9190f2fceb364cb4027e8da5a4e306
   size: 2428
   modtime: 1647706203
 ? /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/.stack-work/dist/x86_64-linux-tinfo6/Cabal-3.0.1.0/build/autogen/cabal_macros.h
-: hash: 3519a9428b1a7183724c20ebd091662c237a6ecf4afc1f8627dc374e915890ab
-  size: 5347
-  modtime: 1647706203
+: hash: 546be06f37dac14da8490c592158ad3430ad0c7067c3893f6715c2236b44b8e9
+  size: 5672
+  modtime: 1647957619
 /usr/include/stdc-predef.h:
   hash: 38bac01c137da3ec6623c5166d420cd0bdee18e1d6605921f138f74ef902f102
   size: 2290
@@ -38,11 +38,19 @@
   hash: 009a99c391931d68e7c34e0c529d55f0e5c664f0492c1e9f3a2f1e0009f48e75
   size: 46
   modtime: 1647706203
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/stack.yaml:
+  hash: 6ad0f02df49625227e37b1159dbb4f55d2af7dde92205aa14acebeeff2645078
+  size: 2119
+  modtime: 1647706203
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/src/Util.hs:
   hash: 0d8fe1218d61fdb864c4feaec192d1b3891e595ae82dca7183d4ae1bfd1c3fb3
   size: 2488
   modtime: 1647710635
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/ci3661.cabal:
-  hash: 679dc1ac91d537c2d709b4b6bf12488feeac1eaebaec9a0614fba74b9d1441a7
-  size: 1447
-  modtime: 1647706908
+  hash: 26eb9e3376ba5a6d55ef41a6257fc51104034ebf2971ae55ae1b594ca1cbd0d4
+  size: 1530
+  modtime: 1647957617
+/home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/src/Solve.hs:
+  hash: 7e5c2263c01b8574baeb21eeab7d9632d8e34b9daedd5fdc0849ba0d51daf716
+  size: 3605
+  modtime: 1647956991

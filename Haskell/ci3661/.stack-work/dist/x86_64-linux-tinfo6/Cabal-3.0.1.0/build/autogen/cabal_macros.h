@@ -22,6 +22,17 @@
   (major1) == 4 && (major2) == 13 && (minor) <= 0)
 #endif /* MIN_VERSION_base */
 
+/* package random-1.1 */
+#ifndef VERSION_random
+#define VERSION_random "1.1"
+#endif /* VERSION_random */
+#ifndef MIN_VERSION_random
+#define MIN_VERSION_random(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  1 || \
+  (major1) == 1 && (major2) == 1 && (minor) <= 0)
+#endif /* MIN_VERSION_random */
+
 /* tool alex-3.2.5 */
 #ifndef TOOL_VERSION_alex
 #define TOOL_VERSION_alex "3.2.5"
@@ -155,10 +166,10 @@
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_PACKAGE_KEY
-#define CURRENT_PACKAGE_KEY "ci3661-0.1.0.0-4kaEuo5A8D0DkuSeu3BBFp"
+#define CURRENT_PACKAGE_KEY "ci3661-0.1.0.0-DpL9cSBjD4MEsBhfxwiEEJ"
 #endif /* CURRENT_PACKAGE_KEY */
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "ci3661-0.1.0.0-4kaEuo5A8D0DkuSeu3BBFp"
+#define CURRENT_COMPONENT_ID "ci3661-0.1.0.0-DpL9cSBjD4MEsBhfxwiEEJ"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.0"

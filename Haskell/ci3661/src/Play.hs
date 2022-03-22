@@ -40,7 +40,7 @@ recursiveReadFive str i = do c <- getChar
                                 c      | isAlpha c && i < 5 -> do putChar c
                                                                   recursiveReadFive (str ++ [toLower c]) (i+1)
                                 _ -> recursiveReadFive str i
--- !!!!!!!!!!!!!!!!!!!!!
+
 
 {- Funciones que ejecutan una sesion del juego-}
 play :: GameState -> IO Result

@@ -111,7 +111,11 @@ fromList xs = go empty xs
 -- | Une dos arboles AA en un solo arbol AA.
 -- | unionAA (Node 1 1 "a" Empty (Node 2 2 "b" Empty Empty)) (Node 1 2 "A" Empty (Node 2 3 "C" Empty Empty)) = (Node 1 1 "a" Empty (Node 2 2 "b" Empty (Node 1 3 "C" Empty Empty)))
 unionAA :: (Ord k) => AA k a -> AA k a -> AA k a
-unionAA x y = fromList (toList x `union` toList y)
+unionAA x y = joinTrees x y 
+  where
+    joinTrees x Empty                   = x
+    joinTrees x (Node _ k v left right) = joinTrees ( insert k v ( joinTrees x right )) left
+
 
 -- | Une dos listas de tuplas en una sola. 
 -- | Si las listas contienen una tupla con la misma clave, se le asigna el valor del arbol que se pasa primero como argumento.
@@ -261,3 +265,7 @@ checkInvariantNode t@(Node n _ _ lnode@(Node ln _ _ _ll _lr)  rnode@(Node rn _ _
                                                                                             | ln /= (n - 1) = LeftChildIsNotOneLess t
                                                                                             | not (isEmpty rr) && lvl rr >= n = RightGrandChildNotStrictlyLess t
                                                                                             | otherwise = Valid
+
+
+--testTree = fromList [(1, 2), (3, 4), (4, 7)]
+--testTree1 = fromList [(-1, -2), (-3, -4), (-4, -7), (3,1), (100, -2)]

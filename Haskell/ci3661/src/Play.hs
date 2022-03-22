@@ -5,6 +5,7 @@ import Match ( fullmatch, match, Guess(Guess), Target(..) )
 import Data.Char (toLower, isAlpha)
 import Util ( turns, yesOrNo )
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
+import System.Random (Random(randomRIO))
 {-Tipo de dato que representa el estado actual del juego-}
 data GameState = GS { played :: Int
                  , won :: Int
@@ -75,15 +76,30 @@ wordNotValid word = "Your guess '" ++ word ++ "' is not a valid word!"
 
 {-Bucle principal del juego-}
 playTheGame :: GameState -> IO()
-playTheGame gs = let targetWord = Target "abaft" -- Cambiar para que se consiga de forma aleatoria con la funcion pickTarget
-                     f gs =  do res <- play gs{target = targetWord, played = played gs+1}
-                                print res
-                                case res of
-                                    Win _ -> pure gs {won = won gs + 1, streak = streak gs + 1}
-                                    Lose _ -> pure gs {lost = lost gs + 1, streak = 0}
-                    in do gs' <- f gs
+playTheGame gs =  do targetWord <- pickTarget $ dict gs -- Cambiar para que se consiga de forma aleatoria con la funcion pickTarget
+                     let f gs = do res <- play gs{target = targetWord, played = played gs+1}
+                                   print res
+                                   case res of
+                                        Win _ -> pure gs {won = won gs + 1, streak = streak gs + 1}
+                                        Lose _ -> pure gs {lost = lost gs + 1, streak = 0} in
+                       do gs' <- f gs
                           print gs'
                           playAgain <- yesOrNo "Play again?"
                           if playAgain
                             then playTheGame gs'
                              else putStrLn "Bye!"
+
+
+
+
+pickTarget :: Ord k => AA k String -> IO Target
+pickTarget tree =do tar <- foldr step (pure (Match.Empty, 0)) tree
+                    pure $ fst tar
+                where
+                    step word acc = do  (choosen, count) <- acc
+                                        r <- randomRIO(0, count::Int)
+                                        if r == 0
+                                            then pure (Target word, count + 1)
+                                            else pure (choosen, count + 1)
+
+--step :: (Random b, Num b, Eq b) => String -> IO (Target, b) -> IO (Target, b)

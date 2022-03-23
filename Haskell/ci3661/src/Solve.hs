@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Solve where
-import Util ()
+import Util (loadDictionary, dictionary)
 import AAtrees ( empty, lookup, AA, insert, fromList )
 import Match
 
@@ -8,6 +8,8 @@ import System.Random (Random (randomRIO))
 import Data.List ( group, sort )
 import Prelude hiding (lookup)
 import Data.Maybe
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
+
 
 data Solver = Naive | Cleverdata
 
@@ -22,18 +24,33 @@ instance Show SolverState where
 
 {-Funcion que inicia el primer estado del asistente-}
 initialSolver :: Solver -> IO SolverState
-initialSolver s = pure (SS "" [] 0 empty s)
+initialSolver s = do dict <- loadDictionary dictionary
+                     pure (SS "" [] (length dict) dict s)
 
 solveTheGame :: SolverState -> IO()
-solveTheGame ss = undefined
+solveTheGame ss = do hSetBuffering stdout NoBuffering -- Importante para mostrar de manera correcta los putStr
+                     hSetBuffering stdin NoBuffering
+                     solveTheGameRec ss 1
+-- Esta fallando porque la lista possible del SolverState SIEMPRE esta vacia. Cuando se llena?
+solveTheGameRec ss n = do print ss
+                          putStr $ "Hint " ++ show n ++ "? (TODO EMOJI)"
+                          hint <- getLine                          
+                          ss' <- naive (read hint :: [Match]) ss
+                          putStr $ "I suggest " ++ suggestion ss'
+
+                          if n == 6
+                              then print "You lost! (TODO EMOJI)"
+                              else solveTheGameRec ss (n+1)
+            
 
 {-Funcion que reduce una lista de posibilidades acorde al match pasado como parámetro
 Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] ["absme", "abste", "ugoto", "ogoti", "uimto", "impto"] = ["ogoti","uimto"] -}
 sieve :: [Match] -> [String] -> [String]
-sieve [] (s : ss) = s : ss
+sieve [] s = s
 sieve m [] = []
-sieve (m : ms) (ls : lss) = reduce (isValid (m : ms)) (ls : lss)
+sieve ms ls = reduce (isValid ms) ls
                             where
+                                reduce f xs = [x | x <- xs, f x x]
                                 isValid [] _ _ = True
                                 isValid _ "" _ = True
                                 isValid (Correct cs : cms) (s : ss) fullWord    | cs == s = isValid cms ss fullWord
@@ -43,18 +60,27 @@ sieve (m : ms) (ls : lss) = reduce (isValid (m : ms)) (ls : lss)
                                 isValid (Misplaced mps: mpms) (s : ss) fullWord | mps /= s && mps `elem` fullWord = isValid mpms ss fullWord
                                                                                 | otherwise = False
 
-reduce :: (a -> a -> Bool) -> [a] -> [a]
-reduce f xs = [x | x <- xs, f x x]
+
+
 
 naive :: [Match] -> SolverState -> IO SolverState
 naive [] ss = pure ss
-naive (m : ms) (SS _ p r d st) = do
-                                    s <- pickRandom possibilities
-                                    return (SS s possibilities r d st)
-                                    where
-                                        possibilities = sieve (m : ms) p
+naive ms (SS _ p r d st) = do
+                            s <- pickRandom possibilities
+                            return (SS s possibilities r d st)
+                            where
+                                possibilities = sieve ms p
 pickRandom :: [a] -> IO a
-pickRandom xs = (xs !!) <$> randomRIO (0, length xs - 1)
+pickRandom [] = error "Lista vacia"
+pickRandom (x:xs) = do tar <- foldr step (pure (x, 0)) xs
+                       pure $ fst tar
+                    where
+                        step x acc = do (choosen, count) <- acc
+                                        r <- randomRIO(0, count::Int)
+                                        if r == 0
+                                            then pure (x, count + 1)
+                                            else pure (choosen, count + 1)
+
 
 clever :: [Match] -> SolverState -> IO SolverState
 clever _ _ = undefined

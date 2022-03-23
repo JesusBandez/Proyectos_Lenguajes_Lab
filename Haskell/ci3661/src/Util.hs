@@ -1,5 +1,5 @@
 module Util where
-import Data.Char (isUpper, isAlpha)
+import Data.Char (isUpper, isAlpha, isAscii)
 import AAtrees ( empty, insert, AA )
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
 
@@ -23,10 +23,10 @@ fiveLetterWords = filter isValid
                             reduce = foldl go (True, 0)
                             go (False, n) _ = (False, n)
                             go (True, 0) c
-                                | isUpper c && isAlpha c = (False, 1)
-                                | otherwise = (True, 1)
+                                | isUpper c = (False, 1)
+                                | isAlpha c && isAscii c = (True, 1)
                             go (True, n) c
-                                | n <= 5 && isAlpha c = (True, n+1)
+                                | n <= 5 && isAlpha c && isAscii c = (True, n+1)
                                 | otherwise = (False, n+1)
 
 
@@ -36,9 +36,9 @@ una palabra de cinco letras-}
 -- Se esta guardando con clave y valor iguales, como deberia ser?
 loadDictionary :: FilePath -> IO (AA String String) 
 loadDictionary x = do l <- readFile x
-                      pure $ foldl step empty $ fiveLetterWords $ lines l
+                      pure $ foldr step empty $ fiveLetterWords $ lines l
                         where
-                            step tree word = insert word word tree
+                            step word tree  = insert word word tree
 
 {-Muestra un mensaje arbitrario y luego pide pide una decision afirmativa o negativa-}
 yesOrNo :: String -> IO Bool 

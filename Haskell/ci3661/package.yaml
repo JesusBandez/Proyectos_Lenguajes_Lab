@@ -29,9 +29,19 @@ library:
   source-dirs: src
   
 executables:
-  prueba-exe:
+  wordle-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         wordle
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ci3661
+
+  solver-exe:
+    main:                Main.hs
+    source-dirs:         solver
     ghc-options:
     - -threaded
     - -rtsopts

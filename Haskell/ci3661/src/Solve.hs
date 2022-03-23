@@ -9,9 +9,11 @@ import Data.List ( group, sort )
 import Prelude hiding (lookup)
 import Data.Maybe
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
+import qualified Data.Foldable
+import Text.Read (readMaybe)
 
 
-data Solver = Naive | Cleverdata
+data Solver = Naive | Clever
 
 data SolverState = SS { suggestion :: String,
                         possible   :: [String],
@@ -19,9 +21,10 @@ data SolverState = SS { suggestion :: String,
                         dict       :: AA String String,
                         strategy   :: Solver }
 instance Show SolverState where
-    show (SS s p r _ _) | s == "" = "There are " ++ show r ++ " possible words."
-                        | otherwise = "There are " ++ show r ++ " possible words. I suggest \171" ++ s ++ "\187"
-
+    show (SS "" p r _ _) = "There are " ++ show r ++ " possible words."
+    show (SS s p r _ _) 
+                    | r > 1 = "There are " ++ show r ++ " possible words. I suggest \171" ++ s ++ "\187"
+                    | otherwise = "It must be \171" ++ s ++ "\187"
 {-Funcion que inicia el primer estado del asistente-}
 initialSolver :: Solver -> IO SolverState
 initialSolver s = do dict <- loadDictionary dictionary
@@ -32,19 +35,43 @@ solveTheGame ss = do hSetBuffering stdout NoBuffering -- Importante para mostrar
                      hSetBuffering stdin NoBuffering
                      solveTheGameRec ss 1
 -- Esta fallando porque la lista possible del SolverState SIEMPRE esta vacia. Cuando se llena?
+
+solveTheGameRec :: SolverState -> Int -> IO ()
 solveTheGameRec ss n = do print ss
-                          putStr $ "Hint " ++ show n ++ "? (TODO EMOJI)"
-                          hint <- getLine
-                          ss' <- naive (read hint :: [Match]) ss
-                          putStr $ "I suggest " ++ suggestion ss'
+                          putStr $ msgInsertHint n                          
+                          hint <- readHint n
+                          let ss' = loadPossibleList ss hint n in
+                            do ss'' <- pickSuggest hint ss'                                                      
+                               if n == 6
+                                then print "You lost! \129325 "
+                                else solveTheGameRec ss'' (n+1)
+                          
 
-                          if n == 6
-                              then print "You lost! (TODO EMOJI)"
-                              else solveTheGameRec ss (n+1)
+pickSuggest :: [Match] -> SolverState -> IO SolverState
+pickSuggest ms ss = case strategy ss of
+    Naive -> naive ms ss
+    Clever -> clever ms ss
 
-
+loadPossibleList :: SolverState -> [Match] -> Int -> SolverState
+loadPossibleList ss ms 1 = ss {possible = sieve ms (Data.Foldable.toList (dict ss))}
+loadPossibleList ss ms n = ss
 {-Funcion que reduce una lista de posibilidades acorde al match pasado como parámetro
 Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] ["absme", "abste", "ugoto", "ogoti", "uimto", "impto"] = ["ogoti","uimto"] -}
+
+msgInsertHint :: Int -> String 
+msgInsertHint 5 = "Hint 5? \128533 "
+msgInsertHint 6 = "Hint 5? \129296 "
+msgInsertHint n = "Hint " ++ show n ++ "? \129300 "
+
+readHint :: Int -> IO [Match]
+readHint n = do input <- getLine
+                case readMaybe input :: Maybe [Match] of
+                 Just hint -> pure hint
+                 Nothing ->  do putStr $ msgInsertHint n
+                                readHint n
+
+    
+
 sieve :: [Match] -> [String] -> [String]
 sieve [] s = s
 sieve m [] = []

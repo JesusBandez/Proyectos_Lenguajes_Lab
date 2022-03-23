@@ -2,7 +2,7 @@ module Play where
 
 import AAtrees ( empty, lookup, AA )
 import Match ( fullmatch, match, Guess(Guess), Target(..) )
-import Data.Char (toLower, isAlpha)
+import Data.Char (toLower, isAlpha, isAscii)
 import Util ( turns, yesOrNo )
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
 import System.Random (Random(randomRIO))
@@ -38,8 +38,8 @@ recursiveReadFive str i = do c <- getChar
                                 '\0127'| i > 0     -> do putStr "\b \b" 
                                                          recursiveReadFive (init str) (i-1)
                                 '\n'   | i == 5    -> pure str
-                                c      | isAlpha c && i < 5 -> do putChar c
-                                                                  recursiveReadFive (str ++ [toLower c]) (i+1)
+                                c      | isAlpha c && isAscii c && i < 5 -> do putChar c
+                                                                               recursiveReadFive (str ++ [toLower c]) (i+1)
                                 _ -> recursiveReadFive str i
 
 
@@ -76,7 +76,7 @@ wordNotValid word = "Your guess '" ++ word ++ "' is not a valid word!"
 
 {-Bucle principal del juego-}
 playTheGame :: GameState -> IO()
-playTheGame gs =  do targetWord <- pickTarget $ dict gs -- Cambiar para que se consiga de forma aleatoria con la funcion pickTarget
+playTheGame gs =  do targetWord <- pickTarget $ dict gs 
                      let f gs = do res <- play gs{target = targetWord, played = played gs+1}
                                    print res
                                    case res of

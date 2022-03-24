@@ -2,6 +2,7 @@ module Main where
 
 import Solve
 import System.Environment (getArgs) -- Necesaria para obtener los argumentos
+import Data.Char (toLower)
 
 
 main = do strategy <- getStrategy
@@ -15,7 +16,7 @@ getStrategy :: IO Solver
 getStrategy = do args <- getArgs
                  case args of
                    [] ->  pure Naive                   
-                   [arg]-> case arg of
+                   [arg]-> case map toLower arg of
                             "naive"  -> pure Naive
                             "clever" -> pure Clever
                             _        -> error msgBadArg

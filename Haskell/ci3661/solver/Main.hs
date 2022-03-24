@@ -1,9 +1,7 @@
 module Main where
 
 import Solve
-import System.Environment (getArgs)
-
-
+import System.Environment (getArgs) -- Necesaria para obtener los argumentos
 
 
 main = do strategy <- getStrategy
@@ -11,6 +9,8 @@ main = do strategy <- getStrategy
           is <- initialSolver strategy
           solveTheGame is
 
+-- Usada para obtener los argumentos y conseguir la estrategia
+-- que debe usar el Solver
 getStrategy :: IO Solver
 getStrategy = do args <- getArgs
                  case args of

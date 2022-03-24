@@ -9,10 +9,6 @@
 -----------------------------------------------------------------------------
 
 module Play (
-    --Custom types
-    GameState(..),
-    Result (..),
-
     -- * Construccion
     initialState,
 
@@ -31,11 +27,11 @@ module Play (
 #endif
 ) where
 
-import AAtrees ( empty, lookup, AA )
+import AAtrees ( lookup, AA )
 import Match ( fullmatch, match, Guess(Guess), Target(..) )
 import Data.Char (toLower, isAlpha, isAscii)
-import Util ( turns, yesOrNo )
-import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
+import Util ( turns, yesOrNo, loadDictionary, dictionary )
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
 import System.Random (Random(randomRIO))
 
 {-Tipo de dato que representa el estado actual del juego-}
@@ -58,9 +54,10 @@ instance Show Result where
 
 {-Funcion que inicia el primer estado del juego-}
 initialState :: IO GameState
-initialState = pure (GS 0 0 0 0 Empty empty)
+initialState = do dictionary <- loadDictionary dictionary
+                  pure (GS 0 0 0 0 Empty dictionary)
 
-{-Leer la conjetura del usuario-}
+{-Lee la conjetura del usuario-}
 readFive :: IO String 
 readFive = do recursiveReadFive "" 0
 
@@ -77,10 +74,13 @@ recursiveReadFive str i = do c <- getChar
 
 {- Funciones que ejecutan una sesion del juego-}
 play :: GameState -> IO Result
-play gs = do hSetBuffering stdout NoBuffering -- Importante para mostrar de manera correcta los putStr
+play gs = do hSetBuffering stdout NoBuffering
              hSetBuffering stdin NoBuffering
              hSetEcho stdin False
-             playLoop (dict gs) 1 (target gs)
+             res <- playLoop (dict gs) 1 (target gs)
+             hSetBuffering stdout LineBuffering 
+             hSetBuffering stdin LineBuffering
+             pure res
 
 {- Bucle donde se piden las palabras al jugador y se comparan con el
 target-}
@@ -121,7 +121,7 @@ playTheGame gs =  do targetWord <- pickTarget $ dict gs
                             then playTheGame gs'
                              else putStrLn "Bye!"
 
-{- Funcion que selecciona una palabra secreta al azar del diccionario -}
+{- Selecciona una palabra secreta al azar del arbol recorriendolo una sola vez -}
 pickTarget :: Ord k => AA k String -> IO Target
 pickTarget tree =do tar <- foldr step (pure (Match.Empty, 0)) tree
                     pure $ fst tar

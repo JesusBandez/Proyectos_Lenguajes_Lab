@@ -38,18 +38,17 @@ import Util (loadDictionary, dictionary, yesOrNo)
 import AAtrees ( empty, lookup, AA, insert, fromList )
 import Match
 
-import Control.Monad (unless, when)
+
 import System.Random (Random (randomRIO))
 import Data.List ( group, sort )
 import Prelude hiding (lookup)
-import Data.Maybe ()
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
 import qualified Data.Foldable
-import Text.Read (readMaybe, Read(readPrec), parens, get, pfail, look )
+import Text.Read (readMaybe)
 import Data.Ord (comparing)
 import Data.Foldable (maximumBy)
-import Play (initialState)
-import GHC.Read (Read(readPrec))
+
+
 
 data Solver = Naive | Clever
 
@@ -112,14 +111,14 @@ loadPossibleList ss ms n = ss
 
 -- Funcion auxiliar para imprimir pistas
 msgInsertHint :: Int -> String
-msgInsertHint 5 = "Hint 5? \128533 "
-msgInsertHint 6 = "Hint 6? \129296 "
-msgInsertHint n = "Hint " ++ show n ++ "? \129300 "
+msgInsertHint 5 = "Hint 5 \128533? "
+msgInsertHint 6 = "Hint 6 \129296? "
+msgInsertHint n = "Hint " ++ show n ++ " \129300? "
 
 -- Funcion auxiliar que lee la pista insertada en formato de Math por el usuario
 readHint :: Int -> IO [Match]
 readHint n = do hSetEcho stdin True
-                input <- getLine
+                input <- getLine                
                 case readMaybe input :: Maybe [Match] of
                  Just hint -> pure hint
                  Nothing ->  do putStr $ msgInsertHint n

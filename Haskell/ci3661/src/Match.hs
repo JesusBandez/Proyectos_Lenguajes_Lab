@@ -30,7 +30,6 @@ module Match (
     ) where
 
 import Text.Read ( Read(readPrec), parens, get, pfail )
-import Text.ParserCombinators.ReadPrec ( get, pfail )
 import Data.Char ( isLetter )
 
 {-Tipo de datos Target. Se permite el constructor Empty porque

@@ -29,7 +29,7 @@ module Util (
 ) where
 import Data.Char (isUpper, isAlpha, isAscii)
 import AAtrees ( empty, insert, AA )
-import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
 
 {-Funcion constante con el numero de turnos para el juego-}
 turns :: Int
@@ -37,12 +37,12 @@ turns = 6
 
 {-Ruta del archivo con las palabras a usar-}
 dictionary :: FilePath 
-dictionary = "/usr/share/dict/american-english" -- Holas
+dictionary = "/usr/share/dict/american-english"
 
 {- Filtra todas las palabras quedandose con aquellas que sean de tamanio 5 y que no sean un sustantivo propio
 fiveLetterWords ["Ramon", "hola", "zip's", "extravagante", "gatos"] = ["gatos"]
  -}
-fiveLetterWords :: [String] -> [String] -- Tiene problemas con las palabras: éclat
+fiveLetterWords :: [String] -> [String]
 fiveLetterWords = filter isValid
                 where
                     isValid "" = False
@@ -61,7 +61,6 @@ fiveLetterWords = filter isValid
 
 {-Carga un arbol AA con las palabras del diccionario que cumplan con el criterio de ser 
 una palabra de cinco letras-}
--- Se esta guardando con clave y valor iguales, como deberia ser?
 loadDictionary :: FilePath -> IO (AA String String) 
 loadDictionary x = do l <- readFile x
                       pure $ foldr step empty $ fiveLetterWords $ lines l
@@ -70,11 +69,15 @@ loadDictionary x = do l <- readFile x
 
 {-Muestra un mensaje arbitrario y luego pide pide una decision afirmativa o negativa-}
 yesOrNo :: String -> IO Bool 
-yesOrNo mesagge = do hSetBuffering stdout NoBuffering -- Importante para mostrar de manera correcta los putStr
+yesOrNo mesagge = do hSetBuffering stdout NoBuffering
                      hSetBuffering stdin NoBuffering
                      hSetEcho stdin False
                      putStr $ mesagge ++ " (y/n)?"
-                     yesOrNoLoop
+                     ans <- yesOrNoLoop
+                     hSetBuffering stdout LineBuffering
+                     hSetBuffering stdin LineBuffering
+                     pure ans
+
 yesOrNoLoop :: IO Bool
 yesOrNoLoop = do c <- getChar 
                  case c of
@@ -83,3 +86,5 @@ yesOrNoLoop = do c <- getChar
                          'n' -> do putStrLn [c]
                                    pure False
                          _ -> yesOrNoLoop
+
+

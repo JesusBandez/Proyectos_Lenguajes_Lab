@@ -69,7 +69,7 @@ module AAtrees
     ) where
 
 import Prelude hiding (lookup)
-import Debug.Trace (traceEvent)
+
 
 
 -- | Un arbol AA que contiene una clave (k) y un valor asociado a esa clave (a).

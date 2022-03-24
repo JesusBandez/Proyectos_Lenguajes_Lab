@@ -12,6 +12,9 @@ import Data.Maybe
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
 import qualified Data.Foldable
 import Text.Read (readMaybe)
+import Data.Ord (comparing)
+import Data.Foldable (maximumBy)
+
 
 
 data Solver = Naive | Clever
@@ -74,7 +77,7 @@ Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] 
 
 msgInsertHint :: Int -> String
 msgInsertHint 5 = "Hint 5? \128533 "
-msgInsertHint 6 = "Hint 5? \129296 "
+msgInsertHint 6 = "Hint 6? \129296 "
 msgInsertHint n = "Hint " ++ show n ++ "? \129300 "
 
 readHint :: Int -> IO [Match]
@@ -125,6 +128,47 @@ pickRandom (x:xs) = do tar <- foldr step (pure (x, 0)) xs
 
 clever :: [Match] -> SolverState -> IO SolverState
 clever [] ss = pure ss
+clever ms (SS _ p r d st) = let s = maxScoreWord possibilities in
+                            do return (SS s possibilities (length possibilities) d st)
+                            where
+                                possibilities = sieve ms p
+
+{- Obtiene la palabra de maximo puntaje de una lista
+maxScoreWord ["Patas", "Carro", "Gatos", "Perro"] = "Carro"
+-}
+maxScoreWord :: [String] -> String
+maxScoreWord ws = fst $ maximumBy (comparing snd) (scoreAllWords ws)
+
+{- Toma una lista de palabras y las compara a todas entre ellas:
+scoreAllWords ["Patas", "Carro", "Gatos", "Perro"] = [("Patas",3),("Carro",3),("Gatos",2),("Perro",2)]-}
+scoreAllWords :: [String] -> [([Char], Int)]
+scoreAllWords ws = map (scoreAWord ws) ws
+
+{- Toma una palabra y consigue su puntacion comparandola con todas las demas palabras en una lista
+scoreAWord ["Patas", "Carro", "Gatos", "Perro"] "Perro" = ("Perro",2)
+-}
+scoreAWord :: Foldable t => t String -> [Char] -> ([Char], Int)
+scoreAWord ws w = foldr step (w, -1) ws
+    where step w (wcomp, n) = (wcomp, n + compareWords w wcomp)
+
+{- Toma dos palabras las compara de forma que si una palabra tiene un caracter en la posicion i
+y la otra palabra tiene el mismo caracter en la posicion i entonces retorna 1, en caso contrario retorna 0
+compareWords "Perro" "Gatos" = 0
+compareWords "Perro" "Patas" = 1
+compareWords "Perro" "Carro" = 1
+-}
+compareWords :: String -> String -> Int
+compareWords w1 w2 = score w1 w2 0
+            where
+                score "" _ n = n
+                score _ "" n = n        
+                score (c1: w1) (c2: w2) 0 = if c1 == c2
+                                             then 1
+                                             else score w1 w2 0
+
+{-
+clever :: [Match] -> SolverState -> IO SolverState
+clever [] ss = pure ss
 clever ms (SS _ p r d st) = do
                             s <- maxWord possibilities
                             return (SS s possibilities (length possibilities) d st)
@@ -154,3 +198,7 @@ maxWord ws = pure $ fst $ maximumWord $ zip ws $ map (scoreWord (freqL ws)) ws
 scoreWord :: AA Char Int -> String -> Int
 scoreWord _ [] = 0
 scoreWord aa (w : ws) = fromMaybe 0 (lookup w aa) + scoreWord aa ws
+
+
+
+-}

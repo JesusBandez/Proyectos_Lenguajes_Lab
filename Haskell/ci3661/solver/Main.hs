@@ -7,5 +7,5 @@ import Solve
 
 
 
-main = do is <- initialSolver Naive
-          solveTheGame is{strategy = Naive}
+main = do is <- initialSolver Clever
+          solveTheGame is

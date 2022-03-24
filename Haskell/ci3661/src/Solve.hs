@@ -1,14 +1,15 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Solve where
-import Util (loadDictionary, dictionary)
+import Util (loadDictionary, dictionary, yesOrNo)
 import AAtrees ( empty, lookup, AA, insert, fromList )
 import Match
 
+import Control.Monad (unless, when)
 import System.Random (Random (randomRIO))
 import Data.List ( group, sort )
 import Prelude hiding (lookup)
 import Data.Maybe
-import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
 import qualified Data.Foldable
 import Text.Read (readMaybe)
 
@@ -22,7 +23,7 @@ data SolverState = SS { suggestion :: String,
                         strategy   :: Solver }
 instance Show SolverState where
     show (SS "" p r _ _) = "There are " ++ show r ++ " possible words."
-    show (SS s p r _ _) 
+    show (SS s p r _ _)
                     | r > 1 = "There are " ++ show r ++ " possible words. I suggest \171" ++ s ++ "\187"
                     | otherwise = "It must be \171" ++ s ++ "\187"
 {-Funcion que inicia el primer estado del asistente-}
@@ -31,21 +32,34 @@ initialSolver s = do dict <- loadDictionary dictionary
                      pure (SS "" [] (length dict) dict s)
 
 solveTheGame :: SolverState -> IO()
-solveTheGame ss = do hSetBuffering stdout NoBuffering -- Importante para mostrar de manera correcta los putStr
+solveTheGame ss = do hSetBuffering stdout NoBuffering -- Desactivar el buffering
                      hSetBuffering stdin NoBuffering
                      solveTheGameRec ss 1
--- Esta fallando porque la lista possible del SolverState SIEMPRE esta vacia. Cuando se llena?
+                     solveTheGamePlayAgain ss
+                     hSetBuffering stdout LineBuffering  -- Activar el buffering
+                     hSetBuffering stdin LineBuffering
+
+
+solveTheGamePlayAgain ss = do playAgain <- yesOrNo "Solve another"                              
+                              if playAgain 
+                                  then do solveTheGameRec ss 1
+                                          solveTheGamePlayAgain ss
+                                  else putStrLn "Bye!"
 
 solveTheGameRec :: SolverState -> Int -> IO ()
-solveTheGameRec ss n = do print ss
-                          putStr $ msgInsertHint n                          
-                          hint <- readHint n
-                          let ss' = loadPossibleList ss hint n in
-                            do ss'' <- pickSuggest hint ss'                                                      
-                               if n == 6
-                                then print "You lost! \129325 "
-                                else solveTheGameRec ss'' (n+1)
-                          
+solveTheGameRec ss n = do
+    print ss
+    if remaining ss == 1
+        then pure()
+        else if n == 7
+              then putStrLn "You lost! \129325 "
+              else do
+               putStr $ msgInsertHint n
+               hint <- readHint n
+               let ss' = loadPossibleList ss hint n in
+                do ss'' <- pickSuggest hint ss'
+                   solveTheGameRec ss'' (n+1)
+
 
 pickSuggest :: [Match] -> SolverState -> IO SolverState
 pickSuggest ms ss = case strategy ss of
@@ -58,19 +72,19 @@ loadPossibleList ss ms n = ss
 {-Funcion que reduce una lista de posibilidades acorde al match pasado como parámetro
 Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] ["absme", "abste", "ugoto", "ogoti", "uimto", "impto"] = ["ogoti","uimto"] -}
 
-msgInsertHint :: Int -> String 
+msgInsertHint :: Int -> String
 msgInsertHint 5 = "Hint 5? \128533 "
 msgInsertHint 6 = "Hint 5? \129296 "
 msgInsertHint n = "Hint " ++ show n ++ "? \129300 "
 
 readHint :: Int -> IO [Match]
-readHint n = do input <- getLine
+readHint n = do hSetEcho stdin True
+                input <- getLine
                 case readMaybe input :: Maybe [Match] of
                  Just hint -> pure hint
                  Nothing ->  do putStr $ msgInsertHint n
                                 readHint n
 
-    
 
 sieve :: [Match] -> [String] -> [String]
 sieve [] s = s
@@ -134,7 +148,7 @@ scoreWords ["ugito", "ogomo", "asbte", "absme"] = [("absme",10),("asbte",10),("o
 
 maxWord :: [String] -> IO String
 maxWord ws = pure $ fst $ maximumWord $ zip ws $ map (scoreWord (freqL ws)) ws
-            where 
+            where
                 maximumWord = foldr1 (\(w1, v1) (w2, v2) -> if v1 >= v2 then (w1, v1) else (w2, v2))
 
 scoreWord :: AA Char Int -> String -> Int

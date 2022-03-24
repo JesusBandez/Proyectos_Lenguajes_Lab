@@ -12,10 +12,10 @@
 module Solve (
     -- * Custom types
     Solver(..),
-    SolverState(..),
+
 
     -- * Constructor 
-    initialState,
+    initialSolver,
 
     -- * Main
     solveTheGame,
@@ -45,10 +45,11 @@ import Prelude hiding (lookup)
 import Data.Maybe ()
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
 import qualified Data.Foldable
-import Text.Read (readMaybe)
+import Text.Read (readMaybe, Read(readPrec), parens, get, pfail, look )
 import Data.Ord (comparing)
 import Data.Foldable (maximumBy)
 import Play (initialState)
+import GHC.Read (Read(readPrec))
 
 data Solver = Naive | Clever
 
@@ -235,7 +236,6 @@ maxWord ws = pure $ fst $ maximumWord $ zip ws $ map (scoreWord (freqL ws)) ws
 scoreWord :: AA Char Int -> String -> Int
 scoreWord _ [] = 0
 scoreWord aa (w : ws) = fromMaybe 0 (lookup w aa) + scoreWord aa ws
-
-
-
 -}
+
+

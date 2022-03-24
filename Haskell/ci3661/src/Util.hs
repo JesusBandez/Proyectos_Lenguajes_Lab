@@ -1,4 +1,32 @@
-module Util where
+{-# LANGUAGE CPP #-}
+
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Util
+-- Authors     :  Jesus Bandez 17-10046
+--                Mariangela Rizzo 17-10538
+-- Portability :  portable
+-----------------------------------------------------------------------------
+
+module Util (
+    -- * Const
+    turns,
+    dictionary,
+
+    -- * Filtro
+    fiveLetterWords,
+
+    -- * Constructor
+    loadDictionary,
+
+    -- * Condicional
+    yesOrNo,
+
+#if defined(TESTING)
+    -- * Internals
+    yesOrNoLoop
+#endif
+) where
 import Data.Char (isUpper, isAlpha, isAscii)
 import AAtrees ( empty, insert, AA )
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )

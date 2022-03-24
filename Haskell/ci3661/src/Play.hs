@@ -1,4 +1,35 @@
-module Play where
+{-# LANGUAGE CPP #-}
+
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Play
+-- Authors     :  Jesus Bandez 17-10046
+--                Mariangela Rizzo 17-10538
+-- Portability :  portable
+-----------------------------------------------------------------------------
+
+module Play (
+    --Custom types
+    GameState(..),
+    Result (..),
+
+    -- * Construccion
+    initialState,
+
+    -- * Main
+    playTheGame
+
+#if defined(TESTING)
+    -- * Internals
+    readFive,
+    recursiveReadFive,
+    play,
+    playLoop,
+    turnStartMsg,
+    wordNotValid,
+    pickTarget
+#endif
+) where
 
 import AAtrees ( empty, lookup, AA )
 import Match ( fullmatch, match, Guess(Guess), Target(..) )
@@ -6,6 +37,7 @@ import Data.Char (toLower, isAlpha, isAscii)
 import Util ( turns, yesOrNo )
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering) )
 import System.Random (Random(randomRIO))
+
 {-Tipo de dato que representa el estado actual del juego-}
 data GameState = GS { played :: Int
                  , won :: Int
@@ -89,9 +121,7 @@ playTheGame gs =  do targetWord <- pickTarget $ dict gs
                             then playTheGame gs'
                              else putStrLn "Bye!"
 
-
-
-
+{- Funcion que selecciona una palabra secreta al azar del diccionario -}
 pickTarget :: Ord k => AA k String -> IO Target
 pickTarget tree =do tar <- foldr step (pure (Match.Empty, 0)) tree
                     pure $ fst tar
@@ -101,5 +131,3 @@ pickTarget tree =do tar <- foldr step (pure (Match.Empty, 0)) tree
                                         if r == 0
                                             then pure (Target word, count + 1)
                                             else pure (choosen, count + 1)
-
---step :: (Random b, Num b, Eq b) => String -> IO (Target, b) -> IO (Target, b)

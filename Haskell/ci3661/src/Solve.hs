@@ -1,5 +1,39 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
-module Solve where
+{-# LANGUAGE CPP #-}
+
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Solve
+-- Authors     :  Jesus Bandez 17-10046
+--                Mariangela Rizzo 17-10538
+-- Portability :  portable
+-----------------------------------------------------------------------------
+
+module Solve (
+    -- * Custom types
+    Solver(..),
+    SolverState(..),
+
+    -- * Constructor 
+    initialState,
+
+    -- * Main
+    solveTheGame,
+
+#if defined(TESTING)
+    -- * Internals
+    solveTheGamePlayAgain,
+    solveTheGameRec,
+    pickSuggest,
+    loadPossibleList,
+    readHint, 
+    msgInsertHint,
+    sieve, 
+    naive,
+    pickRandom,
+    clever, 
+#endif
+) where
 import Util (loadDictionary, dictionary, yesOrNo)
 import AAtrees ( empty, lookup, AA, insert, fromList )
 import Match
@@ -8,14 +42,13 @@ import Control.Monad (unless, when)
 import System.Random (Random (randomRIO))
 import Data.List ( group, sort )
 import Prelude hiding (lookup)
-import Data.Maybe
+import Data.Maybe ()
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
 import qualified Data.Foldable
 import Text.Read (readMaybe)
 import Data.Ord (comparing)
 import Data.Foldable (maximumBy)
-
-
+import Play (initialState)
 
 data Solver = Naive | Clever
 
@@ -29,6 +62,7 @@ instance Show SolverState where
     show (SS s p r _ _)
                     | r > 1 = "There are " ++ show r ++ " possible words. I suggest \171" ++ s ++ "\187"
                     | otherwise = "It must be \171" ++ s ++ "\187"
+                    
 {-Funcion que inicia el primer estado del asistente-}
 initialSolver :: Solver -> IO SolverState
 initialSolver s = do dict <- loadDictionary dictionary
@@ -42,7 +76,8 @@ solveTheGame ss = do hSetBuffering stdout NoBuffering -- Desactivar el buffering
                      hSetBuffering stdout LineBuffering  -- Activar el buffering
                      hSetBuffering stdin LineBuffering
 
-
+-- Funcion auxiliar que reinicia o culmina el solver acorde al input del usuario
+solveTheGamePlayAgain :: SolverState -> IO ()
 solveTheGamePlayAgain ss = do playAgain <- yesOrNo "Solve another"                              
                               if playAgain 
                                   then do solveTheGameRec ss 1
@@ -63,23 +98,24 @@ solveTheGameRec ss n = do
                 do ss'' <- pickSuggest hint ss'
                    solveTheGameRec ss'' (n+1)
 
-
+-- Funcion auxiliar para elegir una sugerencia a mostrar al usuario acorde al metodo pasado como parametro
 pickSuggest :: [Match] -> SolverState -> IO SolverState
 pickSuggest ms ss = case strategy ss of
     Naive -> naive ms ss
     Clever -> clever ms ss
 
+-- Funcion auxiliar que crea la lista de todas las palabras posibles desde el diccionario (si se acaba de arrancar/reiniciar el solver)
 loadPossibleList :: SolverState -> [Match] -> Int -> SolverState
 loadPossibleList ss ms 1 = ss {possible = sieve ms (Data.Foldable.toList (dict ss))}
 loadPossibleList ss ms n = ss
-{-Funcion que reduce una lista de posibilidades acorde al match pasado como parámetro
-Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] ["absme", "abste", "ugoto", "ogoti", "uimto", "impto"] = ["ogoti","uimto"] -}
 
+-- Funcion auxiliar para imprimir pistas
 msgInsertHint :: Int -> String
 msgInsertHint 5 = "Hint 5? \128533 "
 msgInsertHint 6 = "Hint 6? \129296 "
 msgInsertHint n = "Hint " ++ show n ++ "? \129300 "
 
+-- Funcion auxiliar que lee la pista insertada en formato de Math por el usuario
 readHint :: Int -> IO [Match]
 readHint n = do hSetEcho stdin True
                 input <- getLine
@@ -88,7 +124,8 @@ readHint n = do hSetEcho stdin True
                  Nothing ->  do putStr $ msgInsertHint n
                                 readHint n
 
-
+{-Funcion que reduce una lista de posibilidades acorde al match pasado como parámetro
+Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] ["absme", "abste", "ugoto", "ogoti", "uimto", "impto"] = ["ogoti","uimto"] -}
 sieve :: [Match] -> [String] -> [String]
 sieve [] s = s
 sieve m [] = []
@@ -104,9 +141,7 @@ sieve ms ls = reduce (isValid ms) ls
                                 isValid (Misplaced mps: mpms) (s : ss) fullWord | mps /= s && mps `elem` fullWord = isValid mpms ss fullWord
                                                                                 | otherwise = False
 
-
-
-
+{-Funcion que hace uso de random para elegir una sugerencia al usuario de la lista de posibles palabras en el estado pasado como parametro-}
 naive :: [Match] -> SolverState -> IO SolverState
 naive [] ss = pure ss
 naive ms (SS _ p r d st) = do
@@ -114,6 +149,7 @@ naive ms (SS _ p r d st) = do
                             return (SS s possibilities (length possibilities) d st)
                             where
                                 possibilities = sieve ms p
+
 pickRandom :: [a] -> IO a
 pickRandom [] = error "Lista vacia"
 pickRandom (x:xs) = do tar <- foldr step (pure (x, 0)) xs
@@ -157,7 +193,6 @@ compareWords "Perro" "Gatos" = 0
 compareWords "Perro" "Patas" = 1
 compareWords "Perro" "Carro" = 1
 -}
-
 compareWords :: String -> String -> Int
 compareWords w1 w2 = snd $ foldl score (w2, 0) w1
             where 

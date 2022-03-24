@@ -1,12 +1,37 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use newtype instead of data" #-}
+{-# LANGUAGE CPP #-}
+
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Match
+-- Authors     :  Jesus Bandez 17-10046
+--                Mariangela Rizzo 17-10538
+-- Portability :  portable
+-----------------------------------------------------------------------------
 
 
-module Match where
+module Match (
+      --Custom types
+      Target(..),
+      Guess(..),
+      Match(..),          -- instance Eq,Show,Read
 
-import Text.Read
-import Text.ParserCombinators.ReadPrec
-import Data.Char
+
+      -- * Construccion
+      match,
+      fullmatch
+
+#if defined(TESTING)
+      -- * Internals
+      matchLoop
+#endif
+    
+    ) where
+
+import Text.Read ( Read(readPrec), parens, get, pfail )
+import Text.ParserCombinators.ReadPrec ( get, pfail )
+import Data.Char ( isLetter )
 
 {-Tipo de datos Target. Se permite el constructor Empty porque
 un nuevo juego se debe inicializar sin una palabra Target-}

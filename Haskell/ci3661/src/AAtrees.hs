@@ -5,9 +5,9 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Map
--- Authors   :  Jesus Bandez 17-
---              Mariangela Rizzo 17-10538
+-- Module      :  Match
+-- Authors     :  Jesus Bandez 17-10046
+--                Mariangela Rizzo 17-10538
 -- Portability :  portable
 -----------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ module AAtrees
       AA(..),          -- instance Eq,Show,Read
 #endif
 
-      -- * Construction
+      -- * Construccion
       empty,
 
       -- * Insert
@@ -36,7 +36,7 @@ module AAtrees
       lvl,
       sameKey,
 
-      -- * Combine
+      -- * Combinar
       -- ** Union
       unionAA,
       union,
@@ -265,7 +265,3 @@ checkInvariantNode t@(Node n _ _ lnode@(Node ln _ _ _ll _lr)  rnode@(Node rn _ _
                                                                                             | ln /= (n - 1) = LeftChildIsNotOneLess t
                                                                                             | not (isEmpty rr) && lvl rr >= n = RightGrandChildNotStrictlyLess t
                                                                                             | otherwise = Valid
-
-
---testTree = fromList [(1, 2), (3, 4), (4, 7)]
---testTree1 = fromList [(-1, -2), (-3, -4), (-4, -7), (3,1), (100, -2)]

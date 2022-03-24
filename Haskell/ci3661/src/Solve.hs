@@ -157,14 +157,16 @@ compareWords "Perro" "Gatos" = 0
 compareWords "Perro" "Patas" = 1
 compareWords "Perro" "Carro" = 1
 -}
+
 compareWords :: String -> String -> Int
-compareWords w1 w2 = score w1 w2 0
-            where
-                score "" _ n = n
-                score _ "" n = n        
-                score (c1: w1) (c2: w2) 0 = if c1 == c2
-                                             then 1
-                                             else score w1 w2 0
+compareWords w1 w2 = snd $ foldl score (w2, 0) w1
+            where 
+                score ("" , n) c1 = ("", n)
+                score (c2:w2 , n) c1  = if c1 == c2
+                                            then (w2, 1)
+                                            else (w2, n)
+
+
 
 {-
 clever :: [Match] -> SolverState -> IO SolverState

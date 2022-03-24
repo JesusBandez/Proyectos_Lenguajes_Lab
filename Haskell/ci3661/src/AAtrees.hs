@@ -44,7 +44,7 @@ module AAtrees
 
       -- * Traversal
       -- ** Map
-      map,
+      mapTree,
 
       -- * Conversion
       -- ** Lists
@@ -68,7 +68,7 @@ module AAtrees
     
     ) where
 
-import Prelude hiding (lookup,map)
+import Prelude hiding (lookup)
 import Debug.Trace (traceEvent)
 
 
@@ -76,7 +76,7 @@ import Debug.Trace (traceEvent)
 data AA k a = Empty | Node { lvl :: Int, key :: k, val :: a, lAA :: AA k a, rAA :: AA k a}
 
 instance Ord k => Functor (AA k) where
-  fmap f m  = map f m
+  fmap f m  = mapTree f m
 
 instance Ord k => Semigroup (AA k v) where
   a0 <> a1 = a0 `unionAA` a1 
@@ -145,9 +145,9 @@ sameKey :: (Ord ka) => (ka, a) -> (ka, a) -> Bool
 sameKey (kx, x) (ky, y) = kx == ky
 
 -- | Aplica una funcion pasada como argumento a todos los valores en los nodos de un arbol AA.
--- | map (++"a") [(1, "a"), (2, "b"), (3, "c")] = [(1, "aa"), (2, "ba"), (3, "ca")]
-map :: (a -> b) -> AA k a -> AA k b
-map f = go
+-- | mapTree (++"a") [(1, "a"), (2, "b"), (3, "c")] = [(1, "aa"), (2, "ba"), (3, "ca")]
+mapTree :: (a -> b) -> AA k a -> AA k b
+mapTree f = go
   where
       go Empty = Empty
       go (Node n kv v l r) = Node n kv (f v) (go l) (go r)

@@ -1,4 +1,4 @@
-name:                ci3661
+name:                wordle
 version:             1
 github:              "githubuser/ci3661"
 license:             BSD3
@@ -37,7 +37,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - ci3661
+    - wordle
 
   solver-exe:
     main:                Main.hs
@@ -47,7 +47,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - ci3661
+    - wordle
 
 tests:
   ci3661-test:
@@ -58,4 +58,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - ci3661
+    - wordle

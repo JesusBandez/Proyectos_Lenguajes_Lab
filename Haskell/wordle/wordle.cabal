@@ -4,8 +4,8 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           ci3661
-version:        0.1.0.0
+name:           wordle
+version:        1
 description:    Please see the README on GitHub at <https://github.com/githubuser/ci3661#readme>
 homepage:       https://github.com/githubuser/ci3661#readme
 bug-reports:    https://github.com/githubuser/ci3661/issues
@@ -33,7 +33,7 @@ library
       Solve
       Util
   other-modules:
-      Paths_ci3661
+      Paths_wordle
   hs-source-dirs:
       src
   build-depends:
@@ -44,39 +44,39 @@ library
 executable solver-exe
   main-is: Main.hs
   other-modules:
-      Paths_ci3661
+      Paths_wordle
   hs-source-dirs:
       solver
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , ci3661
     , random
+    , wordle
   default-language: Haskell2010
 
 executable wordle-exe
   main-is: Main.hs
   other-modules:
-      Paths_ci3661
+      Paths_wordle
   hs-source-dirs:
       wordle
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , ci3661
     , random
+    , wordle
   default-language: Haskell2010
 
 test-suite ci3661-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_ci3661
+      Paths_wordle
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , ci3661
     , random
+    , wordle
   default-language: Haskell2010

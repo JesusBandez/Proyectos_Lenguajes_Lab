@@ -214,6 +214,9 @@ compareWords w1 w2 = snd $ foldl score (w2, 0) w1
 
 
 {-
+Una implementacion alternativa de clever. La estrategia consiste en puntar las palabras según la frecuencia
+de los caracteres en las palabras posibles.
+
 clever :: [Match] -> SolverState -> IO SolverState
 clever [] ss = pure ss
 clever ms (SS _ p r d st) = do

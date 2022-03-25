@@ -47,6 +47,7 @@ import qualified Data.Foldable
 import Text.Read (readMaybe)
 import Data.Ord (comparing)
 import Data.Foldable (maximumBy)
+import Data.Maybe (fromMaybe)
 
 
 
@@ -228,14 +229,8 @@ freqL ws = fromList $ freqL' $ concat ws
             where
                 freqL' a = map (\x -> (head x, length x)) $ group $ sort a
 
--- !!! Comenté esta función porque sigue la idea de maxWord, solo que retorna un arbol que tiene la palabra como clave y la puntuacion de la palabra como valor. 
--- !!! Cuando hago maximum o un foldl para obtener el valor maximo, me lo da, pero solo el entero, no la clave. 
--- !!! Si consideras que se puede de alguna manera, puedes usar esta función, pero también vi innecesario pasar la lista a arbol si de la misma lista con la idea que llevaba puedo obtener lo que quiero.
-{-Calcula la puntuacion de cada palabra en una lista de palabras acorde a las letras que posee 
-scoreWords ["ugito", "ogomo", "asbte", "absme"] = [("absme",10),("asbte",10),("ogomo",16),("ugito",10)]-}
--- scoreWords :: [String] -> AA String Int
--- scoreWords ws = fromList $ zip ws $ map (scoreWord (freqL ws)) ws
-
+{-Calcula la palabra con mayor puntuación acorde a la popularidad de sus letras
+Ejemplo: scoreWords ["ugito", "ogomo", "asbte", "absme"] = ojomo -}
 maxWord :: [String] -> IO String
 maxWord ws = pure $ fst $ maximumWord $ zip ws $ map (scoreWord (freqL ws)) ws
             where
@@ -245,5 +240,3 @@ scoreWord :: AA Char Int -> String -> Int
 scoreWord _ [] = 0
 scoreWord aa (w : ws) = fromMaybe 0 (lookup w aa) + scoreWord aa ws
 -}
-
-

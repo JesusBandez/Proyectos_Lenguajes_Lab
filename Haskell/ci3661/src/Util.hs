@@ -29,7 +29,7 @@ module Util (
 ) where
 import Data.Char (isUpper, isAlpha, isAscii)
 import AAtrees ( empty, insert, AA )
-import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering), hGetBuffering, hGetEcho )
 
 {-Funcion constante con el numero de turnos para el juego-}
 turns :: Int
@@ -69,13 +69,17 @@ loadDictionary x = do l <- readFile x
 
 {-Muestra un mensaje arbitrario y luego pide pide una decision afirmativa o negativa-}
 yesOrNo :: String -> IO Bool 
-yesOrNo mesagge = do hSetBuffering stdout NoBuffering
+yesOrNo mesagge = do outBuff <- hGetBuffering stdout
+                     inBuff <- hGetBuffering stdin
+                     echo <- hGetEcho stdin
+                     hSetBuffering stdout NoBuffering
                      hSetBuffering stdin NoBuffering
                      hSetEcho stdin False
                      putStr $ mesagge ++ " (y/n)?"
                      ans <- yesOrNoLoop
-                     hSetBuffering stdout LineBuffering
-                     hSetBuffering stdin LineBuffering
+                     hSetBuffering stdout outBuff
+                     hSetBuffering stdin inBuff
+                     hSetEcho stdin echo
                      pure ans
 
 yesOrNoLoop :: IO Bool

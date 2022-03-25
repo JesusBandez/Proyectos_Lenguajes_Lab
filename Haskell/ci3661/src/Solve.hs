@@ -42,7 +42,7 @@ import Match
 import System.Random (Random (randomRIO))
 import Data.List ( group, sort )
 import Prelude hiding (lookup)
-import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering), hGetBuffering, hGetEcho )
 import qualified Data.Foldable
 import Text.Read (readMaybe)
 import Data.Ord (comparing)
@@ -69,12 +69,14 @@ initialSolver s = do dict <- loadDictionary dictionary
                      pure (SS "" [] (length dict) dict s)
 
 solveTheGame :: SolverState -> IO()
-solveTheGame ss = do hSetBuffering stdout NoBuffering -- Desactivar el buffering
+solveTheGame ss = do outBuff <- hGetBuffering stdout
+                     inBuff <- hGetBuffering stdin
+                     hSetBuffering stdout NoBuffering
                      hSetBuffering stdin NoBuffering
                      solveTheGameRec ss 1
                      solveTheGamePlayAgain ss
-                     hSetBuffering stdout LineBuffering  -- Activar el buffering
-                     hSetBuffering stdin LineBuffering
+                     hSetBuffering stdout outBuff
+                     hSetBuffering stdin inBuff
 
 -- Funcion auxiliar que reinicia o culmina el solver acorde al input del usuario
 solveTheGamePlayAgain :: SolverState -> IO ()
@@ -117,12 +119,19 @@ msgInsertHint n = "Hint " ++ show n ++ " \129300? "
 
 -- Funcion auxiliar que lee la pista insertada en formato de Math por el usuario
 readHint :: Int -> IO [Match]
-readHint n = do hSetEcho stdin True
-                input <- getLine                
-                case readMaybe input :: Maybe [Match] of
-                 Just hint -> pure hint
-                 Nothing ->  do putStr $ msgInsertHint n
-                                readHint n
+readHint n = do echo <- hGetEcho stdin
+                hSetEcho stdin True
+                hint <- readHintLoop n
+                hSetEcho stdin echo
+                pure hint
+
+
+readHintLoop :: Int -> IO [Match]
+readHintLoop n = do input <- getLine                
+                    case readMaybe input :: Maybe [Match] of
+                     Just hint -> pure hint
+                     Nothing ->  do putStr $ msgInsertHint n
+                                    readHintLoop n
 
 {-Funcion que reduce una lista de posibilidades acorde al match pasado como parámetro
 Ejemplo: sieve [Misplaced 'i', Absent 'r', Absent 'a', Correct 't', Absent 'e'] ["absme", "abste", "ugoto", "ogoti", "uimto", "impto"] = ["ogoti","uimto"] -}

@@ -31,7 +31,7 @@ import AAtrees ( lookup, AA )
 import Match ( fullmatch, match, Guess(Guess), Target(..) )
 import Data.Char (toLower, isAlpha, isAscii)
 import Util ( turns, yesOrNo, loadDictionary, dictionary )
-import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering) )
+import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering), hGetBuffering, hGetEcho )
 import System.Random (Random(randomRIO))
 
 {-Tipo de dato que representa el estado actual del juego-}
@@ -74,12 +74,16 @@ recursiveReadFive str i = do c <- getChar
 
 {- Funciones que ejecutan una sesion del juego-}
 play :: GameState -> IO Result
-play gs = do hSetBuffering stdout NoBuffering
+play gs = do outBuff <- hGetBuffering stdout
+             inBuff <- hGetBuffering stdin
+             echo <- hGetEcho stdin
+             hSetBuffering stdout NoBuffering
              hSetBuffering stdin NoBuffering
              hSetEcho stdin False
              res <- playLoop (dict gs) 1 (target gs)
-             hSetBuffering stdout LineBuffering 
-             hSetBuffering stdin LineBuffering
+             hSetBuffering stdout outBuff 
+             hSetBuffering stdin inBuff
+             hSetEcho stdin echo
              pure res
 
 {- Bucle donde se piden las palabras al jugador y se comparan con el

@@ -27,7 +27,7 @@ module Play (
 #endif
 ) where
 
-import AAtrees ( lookup, AA )
+import AA ( lookup, AA )
 import Match ( fullmatch, match, Guess(Guess), Target(..) )
 import Data.Char (toLower, isAlpha, isAscii)
 import Util ( turns, yesOrNo, loadDictionary, dictionary )
@@ -80,7 +80,9 @@ play gs = do outBuff <- hGetBuffering stdout
              hSetBuffering stdout NoBuffering
              hSetBuffering stdin NoBuffering
              hSetEcho stdin False
+
              res <- playLoop (dict gs) 1 (target gs)
+             
              hSetBuffering stdout outBuff 
              hSetBuffering stdin inBuff
              hSetEcho stdin echo
@@ -92,7 +94,7 @@ playLoop :: AA String String -> Int -> Target -> IO Result
 playLoop dict turn target = do putStr $ turnStartMsg turn
                                input <- readFive
                                putStr " "
-                               case AAtrees.lookup input dict of
+                               case AA.lookup input dict of
                                    Nothing -> do putStrLn $ wordNotValid input
                                                  playLoop dict turn target
 

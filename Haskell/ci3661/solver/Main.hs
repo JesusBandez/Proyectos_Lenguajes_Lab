@@ -1,10 +1,11 @@
 module Main where
 
-import Solve
+import Solve ( initialSolver, solveTheGame, Solver(..) )
 import System.Environment (getArgs) -- Necesaria para obtener los argumentos
 import Data.Char (toLower)
 
 
+main :: IO ()
 main = do strategy <- getStrategy
           putStrLn $ msgWelcome strategy
           is <- initialSolver strategy

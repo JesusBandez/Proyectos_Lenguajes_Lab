@@ -35,7 +35,7 @@ module Solve (
 #endif
 ) where
 import Util (loadDictionary, dictionary, yesOrNo)
-import AAtrees ( empty, lookup, AA, insert, fromList )
+import AA ( empty, lookup, AA, insert, fromList )
 import Match
 
 

@@ -27,7 +27,7 @@ source-repository head
 
 library
   exposed-modules:
-      AAtrees
+      AA
       Match
       Play
       Solve

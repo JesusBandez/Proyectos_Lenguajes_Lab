@@ -44,7 +44,10 @@ data Guess = Guess String deriving (Eq)
 instance Show Guess where 
     show (Guess g) = "Your guess " ++ g
 
-data Match = Absent Char| Misplaced Char | Correct Char deriving (Eq)
+data Match = Absent Char
+             | Misplaced Char 
+             | Correct Char deriving (Eq)
+             
 instance Show Match where 
     show (Absent m) = "\11035" ++ [m]
     show (Misplaced m) = "\129000" ++ [m]

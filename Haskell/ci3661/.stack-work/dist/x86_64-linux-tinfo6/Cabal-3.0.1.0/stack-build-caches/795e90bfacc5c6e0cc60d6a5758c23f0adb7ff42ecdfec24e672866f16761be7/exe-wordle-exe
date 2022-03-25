@@ -1,7 +1,7 @@
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/wordle/Main.hs:
-  hash: 02fe22eef0b4fd144902f31fbb61781b3afae1124ab0082efca1a4134b7abd81
-  size: 132
-  modtime: 1648163051
+  hash: 70a30de1c57ecabd938101c46b32b19e385dbc24f0a0f740e52cc40647c519da
+  size: 176
+  modtime: 1648245327
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/README.md:
   hash: 0cdb3556139dbbb4a182964933817e725bd4f2129bf6d4096b9c9fb54e3954be
   size: 9
@@ -19,6 +19,6 @@
   size: 2119
   modtime: 1647706203
 /home/jesus/Documents/Lenguajes de Programacion/Proyectos/Proyectos_Lenguajes_Lab/Haskell/ci3661/ci3661.cabal:
-  hash: 1f6107b5357b71e3fe6413fb3556570b59994bd828f4a8e2e3431b3b363688b4
-  size: 1781
-  modtime: 1648161990
+  hash: ad862277fbcb9cc09d5331fc2112bdaf4398d2e2b237600a50973ac56691f380
+  size: 1776
+  modtime: 1648245399

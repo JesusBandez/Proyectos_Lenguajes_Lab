@@ -27,8 +27,8 @@ module Util (
     yesOrNoLoop
 #endif
 ) where
-import Data.Char (isUpper, isAlpha, isAscii)
-import AAtrees ( empty, insert, AA )
+import Data.Char (isAlpha, isAsciiLower)
+import AA ( empty, insert, AA )
 import System.IO (stdout, stdin, hSetBuffering, hSetEcho,BufferMode (NoBuffering, LineBuffering), hGetBuffering, hGetEcho )
 
 {-Funcion constante con el numero de turnos para el juego-}
@@ -50,12 +50,13 @@ fiveLetterWords = filter isValid
                         where
                             reduce = foldl go (True, 0)
                             go (False, n) _ = (False, n)
-                            go (True, 0) c
-                                | isUpper c = (False, 1)
-                                | isAlpha c && isAscii c = (True, 1)
+                            go (True, 0) c                                
+                                | isValidChar c = (True, 1)
+                                | otherwise = (False, 1)
                             go (True, n) c
-                                | n <= 5 && isAlpha c && isAscii c = (True, n+1)
+                                | n <= 5 && isValidChar c = (True, n+1)
                                 | otherwise = (False, n+1)
+                            isValidChar c = isAsciiLower c && isAlpha c
 
 
 
@@ -75,8 +76,10 @@ yesOrNo mesagge = do outBuff <- hGetBuffering stdout
                      hSetBuffering stdout NoBuffering
                      hSetBuffering stdin NoBuffering
                      hSetEcho stdin False
+
                      putStr $ mesagge ++ " (y/n)?"
                      ans <- yesOrNoLoop
+                     
                      hSetBuffering stdout outBuff
                      hSetBuffering stdin inBuff
                      hSetEcho stdin echo

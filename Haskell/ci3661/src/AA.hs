@@ -11,13 +11,13 @@
 -- Portability :  portable
 -----------------------------------------------------------------------------
 
-module AAtrees
+module AA
     (
-      --AAtree type
+      --AA type
 #if !defined(TESTING)
-      AA     ,         -- instance Eq,Show,Read
+      AA     ,         
 #else
-      AA(..),          -- instance Eq,Show,Read
+      AA(..),          
 #endif
 
       -- * Construccion
@@ -34,13 +34,11 @@ module AAtrees
       isEmpty,
       lookup,
       lvl,
-      sameKey,
+      
 
       -- * Combinar
       -- ** Union
       unionAA,
-      union,
-      unionBy,
 
       -- * Traversal
       -- ** Map
@@ -49,9 +47,8 @@ module AAtrees
       -- * Conversion
       -- ** Lists
       toList, 
-      fromList,
-      deleteBy,
-      nubBy,
+      fromList,  
+      
 
       -- * Debugging
       showTree,
@@ -73,7 +70,12 @@ import Prelude hiding (lookup)
 
 
 -- | Un arbol AA que contiene una clave (k) y un valor asociado a esa clave (a).
-data AA k a = Empty | Node { lvl :: Int, key :: k, val :: a, lAA :: AA k a, rAA :: AA k a}
+data AA k a = Empty 
+            | Node { lvl :: Int
+                   , key :: k
+                   , val :: a
+                   , lAA :: AA k a
+                   , rAA :: AA k a}
 
 instance Ord k => Functor (AA k) where
   fmap f m  = mapTree f m
@@ -115,34 +117,6 @@ unionAA x y = joinTrees x y
   where
     joinTrees x Empty                   = x
     joinTrees x (Node _ k v left right) = joinTrees ( insert k v ( joinTrees x right )) left
-
-
--- | Une dos listas de tuplas en una sola. 
--- | Si las listas contienen una tupla con la misma clave, se le asigna el valor del arbol que se pasa primero como argumento.
--- | union [(1, "a"), (2, "b")] [(2, "A"), (3, "C")] = [(1, "a"), (2, "b"), (3, "C")]
-union :: (Ord ka) => [(ka, a)] -> [(ka, a)] -> [(ka, a)]
-union = unionBy sameKey
-
--- | Version de union que acepta el metodo de comparacion como parametro.
-unionBy :: (Ord ka) => ((ka, a) -> (ka, a) -> Bool) -> [(ka, a)] -> [(ka, a)] -> [(ka, a)]
-unionBy eq xs ys =  xs ++ foldl (flip (deleteBy eq)) (nubBy eq ys) xs
-
--- | Si alguna tupla de la lista es igual a la tupla pasada como argumnento, entonces se elimina esa tupla de la lista. 
--- | deleteBy sameKey (2, "aa") [(1, "a"), (2, "aa"), (3, "aaa")] = [(1, "a"), (3, "aaa")]
-deleteBy :: (Ord ka) => ((ka, a) -> (ka, a) -> Bool) -> (ka, a) -> [(ka, a)] -> [(ka, a)]
-deleteBy _  _ [] = []
-deleteBy eq (kx, x) ((ky,y):ys) = if (kx, x) `eq` (ky,y) then ys else (ky,y) : deleteBy eq (kx, x) ys
-
--- | Dentro de la misma lista, no pueden haber tuplas con la misma clave. Deja la primera que encuentre en la lista.
--- | nubBy sameKey [(1, "a"), (2, "aa"), (2, "aaa"), (2, "aaaa")] = [(1, "a"), (2, "aa")]
-nubBy :: ((ka, a) -> (ka, a) -> Bool) -> [(ka, a)] -> [(ka, a)]
-nubBy eq [] =  []
-nubBy eq ((kx, x) :xs) =  (kx, x) : nubBy eq (filter (\ (ky, y) -> not (eq (kx, x) (ky, y))) xs)
-
--- | Compara dos tuplas y retorna true si el primer elemento es el mismo, false en el caso contrario.
--- | sameKey (1, "a") (1, "aa") = True
-sameKey :: (Ord ka) => (ka, a) -> (ka, a) -> Bool
-sameKey (kx, x) (ky, y) = kx == ky
 
 -- | Aplica una funcion pasada como argumento a todos los valores en los nodos de un arbol AA.
 -- | mapTree (++"a") [(1, "a"), (2, "b"), (3, "c")] = [(1, "aa"), (2, "ba"), (3, "ca")]
@@ -216,8 +190,13 @@ level (Node n _ _ _ _) = Just n
 {-------------------------------------------------------------------------------------------------------------
 INVARIANTES
 -------------------------------------------------------------------------------------------------------------}
-
-data AAValid a = Valid | LeafNodeNoOne a | LeftChildIsNotOneLess a | RightChildNotOneLessOrEqual a | RightGrandChildNotStrictlyLess a | NoTwoChildren a 
+-- | Tipo de datos para mostrar si un Nodo es valido o incumple algun invariante
+data AAValid a = Valid 
+              | LeafNodeNoOne a 
+              | LeftChildIsNotOneLess a 
+              | RightChildNotOneLessOrEqual a 
+              | RightGrandChildNotStrictlyLess a 
+              | NoTwoChildren a 
 
 instance (Show k, Show a) => Show (AAValid (AA k a))  where 
      show Valid = "Valid"

@@ -1,31 +1,30 @@
 %%%%%%%%%%%% Motor de busqueda IDDFS %%%%%%%%%%%%%%% 
 % NOTA: (TIENE LA POSIBILIDAD DE QUEDARSE EN BUCLE INFINITO CUANDO NO HAY SOLUCION POSIBLE )
-% En el enunciado no aparece la "historia", por que?. 
+
 % Hay que hacer simular()
 
-iddfs(Problema, Estado, Historia, Movimientos) :-
+iddfs(Problema, Estado, Movimientos) :-
     between(0,inf,Depth),
-    ldfs(Problema, Estado, Historia, Movimientos, Depth).
+    ldfs(Problema, Estado, Movimientos, Depth).
 
 
-ldfs(Problema, Estado, _, [], _) :-
+ldfs(Problema, Estado, [], _) :-
     final(Problema, Estado).
 
-ldfs(Problema, Estado, Historia, [Movimiento|Movimientos], Depth) :-
+ldfs(Problema, Estado, [Movimiento|Movimientos], Depth) :-
     Depth > 0,
 
     movimiento(Problema, Estado, Movimiento),
     moverse(Problema, Estado, Movimiento, Proximo),
     legal(Problema, Proximo),
-    \+ member(Proximo, Historia),
     
     Depth0 is Depth - 1,
 
-    ldfs(Problema, Proximo, [Proximo|Historia], Movimientos, Depth0).
+    ldfs(Problema, Proximo, Movimientos, Depth0).
 
 resolver(Problema, Movimientos) :-
     inicial(Problema, Inicial),
-    iddfs(Problema, Inicial, [Inicial], Movimientos).
+    iddfs(Problema, Inicial, Movimientos).
 
 %%%%%%%%%%%%%%%%%% Problema del caballero (Para probar el motor) %%%%%%%%%%%%
 
@@ -56,7 +55,7 @@ legal(knight, knight(F, C, MaxF, MaxC)) :-
 
 canales(Televisores, N, L) :-
     Inicial = estado(Televisores, N, -1, -1),
-    iddfs(controlRemoto, Inicial, [Inicial], L).
+    iddfs(controlRemoto, Inicial, L).
 
 final(controlRemoto, estado([X, X, X, X], _, _, _)).
 

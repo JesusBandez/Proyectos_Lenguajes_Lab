@@ -1,19 +1,50 @@
-%%%%%%%%%%%% Motor de busqueda IDDFS %%%%%%%%%%%%%%% 
-% NOTA: (TIENE LA POSIBILIDAD DE QUEDARSE EN BUCLE INFINITO CUANDO NO HAY SOLUCION POSIBLE )
+% Autores:
+% Jesus Bandez 17-10046
+% Mariangela Rizzo 17-10538
 
-% Hay que hacer simular()
-
+%%%%%%%%%%%% Motor de busqueda IDDFS %%%%%%%%%%%%%%%
 iddfs(Problema, Inicial, Movimientos) :-
-    iddfs(Problema, Inicial, [Inicial], Movimientos).
+    % Se inicializa creando una clausula que indica que hay mas nodos por explorar
+    asserta(hayMasNodos(true)),
+    % Llamada inicial con profundidad 0
+    iddfs(Problema, Inicial, [Inicial], Movimientos, 0).
 
-iddfs(Problema, Estado, Historia, Movimientos) :-
-    between(0,inf,Depth),
+% Si no hay mas nodos por explorar, se acaba la busqueda.
+iddfs(_, _, _, _, _) :-
+    \+ hayMasNodos(true),
+    fail.
+
+% Si hay mas nodos por explorar en la profundidad actual, se exploran
+iddfs(Problema, Estado, Historia, Movimientos, Depth) :-
+    retract(hayMasNodos(true)),
     ldfs(Problema, Estado, Historia, Movimientos, Depth).
 
+% Si no se pudo conseguir la respuesta con la profundidad actual, se busca
+% en el siguiente nivel de profundidad
+iddfs(Problema, Estado, Historia, Movimientos, Depth) :- 
+    retract(hayMasNodos(true)),
+    Depth0 is Depth+1,
+    iddfs(Problema, Estado, Historia, Movimientos, Depth0).
 
+% Si se llega a un estado que es el final, se ha encontrado la solucion
 ldfs(Problema, Estado, _, [], _) :-
     final(Problema, Estado).
 
+% Si se llega a la profundidad 0 y no se ha encontrado la solucion, se comprueba
+% que se pueda obtener un estado legal que no exista en la historia. Esto es,
+% se comprueba si aun queda otro estado por explorar. Si existe, se crea una
+% clausula que confirma que quedan estados por explorar. En caso contrario,
+% la clausula no es creada.
+ldfs(Problema, Estado, Historia, [], 0) :-
+    \+ hayMasNodos(true),
+    movimiento(Problema, Estado, Movimiento),
+    moverse(Problema, Estado, Movimiento, Proximo),
+    legal(Problema, Proximo),
+    \+ member(Proximo, Historia),
+    asserta(hayMasNodos(true)),
+    fail.
+
+% Se exploran los nodos desde la profundidad Depth hasta la profundidad 0
 ldfs(Problema, Estado, Historia, [Movimiento|Movimientos], Depth) :-
     Depth > 0,
 
@@ -30,36 +61,17 @@ resolver(Problema, Movimientos) :-
     inicial(Problema, Inicial),
     iddfs(Problema, Inicial, Movimientos).
 
-%%%%%%%%%%%%%%%%%% Problema del caballero (Para probar el motor) %%%%%%%%%%%%
-
-%inicial(knight, knight(1, 1, 5, 10)).
-%
-%final(knight, knight(5, 7, 5, 10)).
-%
-%movimiento(knight, _, Move) :-
-%    member(Move, [[2,1], [1,2], [2,-1], [1,-2], [-1,-2], [-2, -1], [-2, 1], [-1, 2]]).
-%
-%moverse(knight, knight(F, C, MaxF, MaxC), [DF, DC], knight(NF, NC, MaxF, MaxC)) :-
-%    NF is F + DF, NC is C + DC.
-%
-%legal(knight, knight(F, C, MaxF, MaxC)) :-
-%    F >= 1, F =< MaxF,
-%    C >= 1, C =< MaxC.
 
 :- discontiguous([inicial/2, final/2, movimiento/3, moverse/4, legal/2]).
 :- dynamic inicial/2.
 :- dynamic final/2.
+:- dynamic hayMasNodos/1.
+
 %%%%%%%%%%%%%%    Problemas de los canales  %%%%%%%%%%%%%
 % Los estados son el functor estado(Televisores, N, actual, last), donde Televisores son los canales
 % actuales de cada televisor, N la cantidad de canales posibles, actual es el televisor al que se le
 % cambio recietemente el canal y last es el televisor al que se le cambio el canal antes
 % del ultimo televisor cambiado de canal
-
-
-%canales(Televisores, N, L) :-
-%    Inicial = estado(Televisores, N, -1, -1),
-%    iddfs(controlRemoto, Inicial, L).
-
 canales(Televisores, N, L) :-
     asserta(inicial(controlRemoto, estado(Televisores, N, -1, -1))),
     resolver(controlRemoto, L),
@@ -100,11 +112,14 @@ vagones(CuelloInicial, CuelloFinal, Operaciones) :-
 % Todos los movimientos posibles de push
 movimiento(vagones, estado([Vagon|R], _, _), push(Direccion, VagonesAMover)) :-
     length([Vagon|R], Len),
-    between(1, Len, VagonesAMover),
-    direccion(Direccion).
+    direccion(Direccion),
+    between(1, Len, VagonesAMover).
+    
 
-direccion(above).
 direccion(below).
+direccion(above).
+
+
 % Todos los movimientos de pop desde Above
 movimiento(vagones, estado(_, [Vagon|R], _), pop(above, VagonesAMover)) :-
     length([Vagon|R], Len),
@@ -141,5 +156,5 @@ moverse(vagones, estado(Base, Arriba, Abajo), pop(below, VagonesAMover), estado(
     append(L, AbajoNew, Abajo),
     append(Base, L, BaseNew).
 
-% Por la forma en la que se consiguen los movimientos, todos son legales.
+% Por la forma en la que se consiguen los movimientos, todos los estados conseguidos son legales
 legal(vagones, _).

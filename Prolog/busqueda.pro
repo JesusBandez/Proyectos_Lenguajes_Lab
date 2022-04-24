@@ -2,49 +2,46 @@
 % Jesus Bandez 17-10046
 % Mariangela Rizzo 17-10538
 
-%%%%%%%%%%%% Motor de busqueda IDDFS %%%%%%%%%%%%%%%
+%%%% Motor de busqueda IDDFS
+
+% Predicado auxiliar que crea un atomo en la base de datos.
+% Si el atomo existe, lo crea y lo vuelve a eliminar.
+existenNodos(X) :-
+    retract(X), !, asserta(X).
+existenNodos(X) :-
+    asserta(X).
+
+% busqueda iddfs. Crea el atomo indicando que hay nodos por explorar
+% y luego llama al predicado auxiliar para iniciar la busqueda con 
+% profundidad 0
 iddfs(Problema, Inicial, Movimientos) :-
-    % Se inicializa creando una clausula que indica que hay mas nodos por explorar
-    asserta(hayMasNodos(true)),
-    % Llamada inicial con profundidad 0
+    existenNodos(hayNodos),
     iddfs(Problema, Inicial, [Inicial], Movimientos, 0).
 
-% Si no hay mas nodos por explorar, se acaba la busqueda.
+% Si el atomo "hayNodos" existe en la base de datos, es porque hay nodos por explorar.
+% Entonces, se borra el atomo de la base de datos y se exploran los nodos.
+% Si el atomo no existe en la base de datos, entonces no hay mas nodos por explorar y
+% la busqueda falla
 iddfs(_, _, _, _, _) :-
-    \+ hayMasNodos(true),
-    fail.
+    \+ retract(hayNodos), !, fail.
 
-% Si hay mas nodos por explorar en la profundidad actual, se exploran
+% Se llama a la busqueda desde la profundidad "Depth".
 iddfs(Problema, Estado, Historia, Movimientos, Depth) :-
-    retract(hayMasNodos(true)),
     ldfs(Problema, Estado, Historia, Movimientos, Depth).
 
-% Si no se pudo conseguir la respuesta con la profundidad actual, se busca
-% en el siguiente nivel de profundidad
-iddfs(Problema, Estado, Historia, Movimientos, Depth) :- 
-    retract(hayMasNodos(true)),
+% Si la busqueda en la profundidad Depth falla, entonces se busca
+% en la profundidad Depth + 1.
+iddfs(Problema, Estado, Historia, Movimientos, Depth) :-
     Depth0 is Depth+1,
     iddfs(Problema, Estado, Historia, Movimientos, Depth0).
 
-% Si se llega a un estado que es el final, se ha encontrado la solucion
-ldfs(Problema, Estado, _, [], _) :-
+% Al llegar a la profundidad 0, pueden haber mas nodos. Se crea el atomo
+% que indica que hay mas nodos y se comprueba si está en el estado final.
+ldfs(Problema, Estado, _, [], 0) :-
+    existenNodos(hayNodos),
     final(Problema, Estado).
 
-% Si se llega a la profundidad 0 y no se ha encontrado la solucion, se comprueba
-% que se pueda obtener un estado legal que no exista en la historia. Esto es,
-% se comprueba si aun queda otro estado por explorar. Si existe, se crea una
-% clausula que confirma que quedan estados por explorar. En caso contrario,
-% la clausula no es creada.
-ldfs(Problema, Estado, Historia, [], 0) :-
-    \+ hayMasNodos(true),
-    movimiento(Problema, Estado, Movimiento),
-    moverse(Problema, Estado, Movimiento, Proximo),
-    legal(Problema, Proximo),
-    \+ member(Proximo, Historia),
-    asserta(hayMasNodos(true)),
-    fail.
-
-% Se exploran los nodos desde la profundidad Depth hasta la profundidad 0
+% Se ejecuta la busqueda en el nivel Depth y se procede a buscar en Depth-1
 ldfs(Problema, Estado, Historia, [Movimiento|Movimientos], Depth) :-
     Depth > 0,
 
@@ -65,7 +62,7 @@ resolver(Problema, Movimientos) :-
 :- discontiguous([inicial/2, final/2, movimiento/3, moverse/4, legal/2]).
 :- dynamic inicial/2.
 :- dynamic final/2.
-:- dynamic hayMasNodos/1.
+:- dynamic hayNodos/0.
 
 %%%%%%%%%%%%%%    Problemas de los canales  %%%%%%%%%%%%%
 % Los estados son el functor estado(Televisores, N, actual, last), donde Televisores son los canales
@@ -76,6 +73,12 @@ canales(Televisores, N, L) :-
     asserta(inicial(controlRemoto, estado(Televisores, N, -1, -1))),
     resolver(controlRemoto, L),
     retractall(inicial(controlRemoto, _)).
+
+% Predicado que se encarga de limpiar las clausulas creadas en caso de que
+% resolver falle.
+canales(_, _, _) :-
+    retractall(inicial(controlRemoto, _)), !,
+    fail.
 
 final(controlRemoto, estado([X, X, X, X], _, _, _)).
 
@@ -109,16 +112,22 @@ vagones(CuelloInicial, CuelloFinal, Operaciones) :-
     retractall(final(vagones, _)),
     retractall(inicial(vagones, _)).
 
+% Predicado que se encarga de limpiar las clausulas creadas en caso de que
+% resolver falle.
+vagones(_, _, _) :-
+    retractall(final(vagones, _)),
+    retractall(inicial(vagones, _)), !,
+    fail.
+
+
 % Todos los movimientos posibles de push
 movimiento(vagones, estado([Vagon|R], _, _), push(Direccion, VagonesAMover)) :-
     length([Vagon|R], Len),
     direccion(Direccion),
     between(1, Len, VagonesAMover).
     
-
-direccion(below).
 direccion(above).
-
+direccion(below).
 
 % Todos los movimientos de pop desde Above
 movimiento(vagones, estado(_, [Vagon|R], _), pop(above, VagonesAMover)) :-

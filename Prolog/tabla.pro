@@ -5,12 +5,12 @@
 :- op(1120, xfy, :<=>:).   % doble implicacion
 
 % loop que pide una formula con un prompt.
-truthable :-
+truthtable :-
     repeat,
     write('formula '), read(F),
     procesar(F), !.
 
-truthablepro :-
+truthtablepro :-
     repeat,
     write('formula '), read(F),
     procesarpro(F), !.
